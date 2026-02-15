@@ -13,6 +13,7 @@ import json
 import random
 import requests
 from agent_convo import rp
+from meeting_bridge import meeting_bridge_bp
 
 try:
     import config
@@ -22,6 +23,7 @@ except ModuleNotFoundError:
 
 app = Flask(__name__)
 app.register_blueprint(rp)
+app.register_blueprint(meeting_bridge_bp)
 app.secret_key = 'autogptsamurai@123'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./test.db'
