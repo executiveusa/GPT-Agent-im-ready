@@ -1,3 +1,31 @@
+<div align="center">
+
+# 🏠 Pauli's Place — Agent Meeting Room
+
+### `PLI-000` · Shadow Leader's HQ & Fleet Meeting Place
+
+[![Built by The Pauli Effect](https://img.shields.io/badge/Built%20by-The%20Pauli%20Effect-blueviolet?style=for-the-badge)](https://github.com/executiveusa)
+[![Agent Fleet](https://img.shields.io/badge/Agent%20Fleet-v1.0-ff6b6b?style=for-the-badge)](https://github.com/executiveusa/dashboard-agent-swarm/blob/main/AGENTS.md)
+[![Deploy to Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/executiveusa/GPT-Agent-im-ready)
+[![Deploy to Cloudflare](https://img.shields.io/badge/Deploy-Cloudflare-f38020?style=for-the-badge&logo=cloudflare)](https://deploy.workers.cloudflare.com/?url=https://github.com/executiveusa/GPT-Agent-im-ready)
+[![Run on Docker](https://img.shields.io/badge/Run%20on-Docker-2496ED?style=for-the-badge&logo=docker)](https://github.com/executiveusa/GPT-Agent-im-ready#docker)
+
+</div>
+
+---
+
+> **Part of the 17-agent Pauli Effect fleet** · Flask + React + SQLAlchemy  
+> Official meeting place for all agents · Standups · Sprint planning · Real-time chat
+
+## Docker
+
+```bash
+docker build -t pauli/paulis-place .
+docker-compose up -d
+```
+
+---
+
 # Camel-AutoGPT
 
 [![GitHub stars](https://img.shields.io/github/stars/SamurAIGPT/GPT-Agent?style=social)](https://github.com/SamurAIGPT/GPT-Agent/stargazers)
