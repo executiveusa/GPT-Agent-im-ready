@@ -242,6 +242,23 @@ acfs init --agents dashboard-agent-swarm,agent-zero-Fork,devika-agent
 
 ---
 
+## External Tools Integration (Ralphy Loop — Phase 0)
+
+The fleet now uses a strict contract for adding third-party tooling:
+
+- **Contract/placement matrix**: `integrations/external-tools-contract.md`
+- **Security/install policy**: `integrations/external-tools-security-policy.md`
+- **Telemetry event schema**: `integrations/external-tools-telemetry-schema.md`
+
+### Mandatory rules
+
+1. Domain-native placement first; dashboard remains observability + control surface.
+2. Rollout in waves: Core 4 repos first, then all 11 repos.
+3. No blind `curl | bash` installs in fleet automation.
+4. Every integration action must emit `agent-fleet-v1` telemetry events.
+
+---
+
 ## Voice Agent Stack
 
 > **SYNTHIA** (SYN-005) is the fleet's voice layer, powered by 4 voice repos.
