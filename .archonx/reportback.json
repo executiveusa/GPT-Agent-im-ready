@@ -1,0 +1,13 @@
+﻿{
+    "enforced_at":  "2026-02-19T01:28:00-06:00",
+    "contacts":  {
+                     "channel":  "reportback",
+                     "orchestrator":  "archonx-os"
+                 },
+    "source_of_truth":  "executiveusa/archonx-os",
+    "required_reports":  [
+                             "ops/reports/PAULIWHEEL_COMPLIANCE_MATRIX_\u003ctimestamp\u003e.json",
+                             "ops/reports/FINAL_ECO_PROMPT_REPORT.json"
+                         ],
+    "bead_id":  "BEAD-0005"
+}
