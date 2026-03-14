@@ -1,0 +1,11 @@
+{
+  "name": "paulis-place-world",
+  "private": true,
+  "scripts": {
+    "world": "npm --prefix client start",
+    "agents": "node backend/websocket_server/index.js",
+    "avatars": "node backend/avatar_pipeline/watcher.js",
+    "build-avatars": "node backend/avatar_pipeline/build-avatars.js",
+    "test:backend": "node backend/tests/smoke.test.js"
+  }
+}

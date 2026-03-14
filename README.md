@@ -131,3 +131,51 @@ Join our Discord: [discord.gg/A6EzvsKX4u](https://discord.gg/A6EzvsKX4u)
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
+
+## Real-Time AI Agent Meeting World
+
+This repo now includes a Three.js-powered meeting simulator at `http://localhost:3000/world`.
+
+### What it includes
+
+- 3D meeting room with seats and speaker-focused camera
+- Automatic avatar ingestion from `assets/avatars_input`
+- Avatar generation to GLB in `assets/avatars_generated`
+- Local TTS pipeline (`Coqui TTS` with `espeak` fallback)
+- Lip-sync generation (`rhubarb-lip-sync` with deterministic fallback)
+- Socket.IO real-time meeting turns
+
+### Run
+
+```bash
+# install JS dependencies
+npm install
+npm --prefix backend install
+npm --prefix client install
+
+# install Python services
+pip install -r services/requirements.txt
+
+# build avatars from dropped images
+npm run build-avatars
+
+# terminal 1
+npm run agents
+
+# terminal 2
+npm run world
+
+# optional watcher
+npm run avatars
+```
+
+### New services and folders
+
+- `backend/websocket_server` — Express + Socket.IO event server
+- `backend/conversation_engine` — rotating multi-agent dialogue turns
+- `backend/avatar_pipeline` — image watcher + GLB generation
+- `services/tts` — local speech generation API script
+- `services/lipsync` — phoneme timeline generation
+- `services/avatar_generation` — image-to-avatar mesh generation
+
+> Note: binary demo assets are intentionally not committed. Drop your own images into `assets/avatars_input/` and run `npm run build-avatars`.
