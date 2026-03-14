@@ -1,0 +1,10 @@
+﻿{
+    "toolbox_registry":  "..\\\\archonx-os\\\\toolbox\\\\toolbox.json",
+    "enabled_skills":  [
+                           "pauliwheel_coding_protocol",
+                           "beads_manager",
+                           "ralphy_loop_enforcer",
+                           "agent_lightning_bootstrap"
+                       ],
+    "bead_id":  "BEAD-0005"
+}
