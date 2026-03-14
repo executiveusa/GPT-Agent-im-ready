@@ -1,0 +1,13 @@
+# User-provided source images
+avatars_input/*
+!avatars_input/.gitkeep
+
+# Generated avatar meshes
+avatars_generated/*
+!avatars_generated/.gitkeep
+
+# Generated runtime artifacts
+voices/*
+!voices/.gitkeep
+lipsync/*
+!lipsync/.gitkeep

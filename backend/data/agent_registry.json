@@ -1,0 +1,20 @@
+{
+  "Engineer": {
+    "avatar": "/avatars_generated/Engineer.glb",
+    "voice": "en-us",
+    "seat": 1,
+    "style": "cartoon"
+  },
+  "Researcher": {
+    "avatar": "/avatars_generated/Researcher.glb",
+    "voice": "en-sc",
+    "seat": 2,
+    "style": "realistic"
+  },
+  "Strategist": {
+    "avatar": "/avatars_generated/Strategist.glb",
+    "voice": "en",
+    "seat": 0,
+    "style": "semi_realistic"
+  }
+}
