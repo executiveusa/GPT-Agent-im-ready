@@ -42,3 +42,5 @@ npm-debug.log*
 # Test
 coverage/
 .pytest_cache/
+
+package-lock.json
