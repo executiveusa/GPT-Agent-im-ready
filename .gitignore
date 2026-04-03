@@ -15,6 +15,7 @@ venv/
 .venv/
 
 # Build artifacts
+.next/
 client/build/
 dist/
 *.egg-info/
