@@ -15,6 +15,7 @@ venv/
 .venv/
 
 # Build artifacts
+.next/
 client/build/
 dist/
 *.egg-info/
@@ -41,3 +42,5 @@ npm-debug.log*
 # Test
 coverage/
 .pytest_cache/
+
+package-lock.json

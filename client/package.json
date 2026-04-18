@@ -1,52 +1,40 @@
 {
-  "name": "autogpt",
-  "version": "0.1.0",
+  "name": "im-ready",
+  "version": "1.0.0",
   "private": true,
-  "proxy": "http://localhost:5000",
-  "dependencies": {
-    "@reduxjs/toolkit": "^1.9.0",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.2.0",
-    "bootstrap": "^5.2.3",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.6.0",
-    "react-dom": "^18.2.0",
-    "react-markdown": "^8.0.5",
-    "react-redux": "^8.0.5",
-    "react-router-dom": "^6.4.3",
-    "react-scripts": "5.0.1",
-    "react-toastify": "^9.1.1",
-    "remark-gfm": "^3.0.1",
-    "web-vitals": "^2.1.4",
-    "three": "^0.173.0",
-    "@react-three/fiber": "^8.17.14",
-    "@react-three/drei": "^9.121.4",
-    "socket.io-client": "^4.8.1"
+  "engines": {
+    "node": "20.x"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "dependencies": {
+    "@react-three/drei": "^9.97.0",
+    "@react-three/fiber": "^8.15.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^10.18.0",
+    "lucide-react": "^0.298.0",
+    "next": "14.2.30",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.2.0",
+    "three": "^0.160.0",
+    "zustand": "^4.4.7"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/three": "^0.160.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.2.30",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.3"
   }
 }
