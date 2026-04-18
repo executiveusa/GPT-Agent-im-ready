@@ -112,7 +112,7 @@ function AgentConvoShare() {
                     <Modal.Body className="p-5 position-relative">
                     <b style={{cursor:'pointer'}} onClick={()=>setShowBanner(false)} className="position-absolute top-0 end-0 me-4 mt-2">X</b>
                     <Stack className="align-items-center" gap={3}>
-                    <a href="https://www.producthunt.com/posts/camel-agi?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-camel&#0045;agi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=389872&theme=light" alt="Camel&#0032;AGI - Communicative&#0032;Agents&#0032;on&#0032;GPT | Product Hunt" /></a>                        
+                    <a href="https://www.producthunt.com/posts/camel-agi?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-camel&#0045;agi" target="_blank" rel="noreferrer"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=389872&theme=light" alt="Camel&#0032;AGI - Communicative&#0032;Agents&#0032;on&#0032;GPT | Product Hunt" /></a>                        
                     </Stack>
                 </Modal.Body>
             </Modal> 

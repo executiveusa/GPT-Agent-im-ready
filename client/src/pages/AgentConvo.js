@@ -215,7 +215,7 @@ function AgentConvo() {
                             </>:
                             <Stack className="align-items-center" gap={3}>
                                 <h6><b>Add your OpenAI Key</b></h6>
-                                <p><small>Get your OpenAI Key by signing up/ logging in from the OpenAI Dashboard. </small><a target="_blank" href="https://platform.openai.com/account/api-keys">Go to Dashboard</a></p>
+                                <p><small>Get your OpenAI Key by signing up/ logging in from the OpenAI Dashboard. </small><a target="_blank" href="https://platform.openai.com/account/api-keys" rel="noreferrer">Go to Dashboard</a></p>
                                 <InputGroup >
                                     <FormControl className="chat-input px-md-5 py-md-2 shadow-none"
                                     style={{height:'48px'}}
@@ -247,9 +247,9 @@ function AgentConvo() {
                 <Modal.Body className="p-5 position-relative">
                 <b style={{cursor:'pointer'}} onClick={()=>setShowBanner(false)} className="position-absolute top-0 end-0 me-4 mt-2">X</b>
                 <Stack className="align-items-center" gap={3}>
-                    <a href="https://www.producthunt.com/posts/camel-agi?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-camel&#0045;agi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=389872&theme=light" alt="Camel&#0032;AGI - Communicative&#0032;Agents&#0032;on&#0032;GPT | Product Hunt" /></a>                    
-                    <a className="discord-invite px-3 py-3 ms-3" target="_blank" href="https://discord.gg/A6EzvsKX4u"><DiscordIcon className="icon me-1"/> Join Our Discord</a>
-                    <a className="discord-invite px-3 py-3 ms-3" target="_blank" href="https://github.com/SamurAIGPT/Camel-AutoGPT/">Star CamelAGI on Github</a>
+                    <a href="https://www.producthunt.com/posts/camel-agi?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-camel&#0045;agi" target="_blank" rel="noreferrer"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=389872&theme=light" alt="Camel&#0032;AGI - Communicative&#0032;Agents&#0032;on&#0032;GPT | Product Hunt" /></a>                    
+                    <a className="discord-invite px-3 py-3 ms-3" target="_blank" href="https://discord.gg/A6EzvsKX4u" rel="noreferrer"><DiscordIcon className="icon me-1"/> Join Our Discord</a>
+                    <a className="discord-invite px-3 py-3 ms-3" target="_blank" href="https://github.com/SamurAIGPT/Camel-AutoGPT/" rel="noreferrer">Star CamelAGI on Github</a>
                 </Stack>
                 </Modal.Body>
             </Modal> 				
