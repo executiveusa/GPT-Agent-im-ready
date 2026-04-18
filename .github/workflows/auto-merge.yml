@@ -1,0 +1,74 @@
+name: Auto Merge
+
+# Fires after the CI workflow completes on a pull request
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+
+jobs:
+  auto-merge:
+    name: Auto-merge when CI is green
+    # Only merge if CI passed and this is a PR (not a direct push)
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+
+    steps:
+      - name: Get PR number from workflow run
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runs = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.payload.workflow_run.id,
+            });
+            // Find associated PR
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: context.payload.workflow_run.head_branch,
+            });
+            if (prs.data.length === 0) {
+              core.info('No open PR found for this branch – skipping');
+              return;
+            }
+            const pr = prs.data[0];
+            core.setOutput('number', pr.number);
+            core.setOutput('title', pr.title);
+
+      - name: Approve and merge PR
+        if: steps.pr.outputs.number != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt('${{ steps.pr.outputs.number }}');
+
+            // Approve
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              event: 'APPROVE',
+              body: '✅ All CI checks passed — auto-approving for merge.',
+            });
+
+            // Squash merge
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              merge_method: 'squash',
+              commit_title: '${{ steps.pr.outputs.title }}',
+              commit_message: 'Auto-merged after CI passed ✅',
+            });
+
+            core.info(`Merged PR #${prNumber}`);

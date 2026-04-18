@@ -1,0 +1,256 @@
+name: Deploy
+
+# One-click deploy to all targets after merge to main
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Deploy target'
+        required: false
+        default: all
+        type: choice
+        options: [all, vercel, coolify, vps, cloudflare]
+
+# Cancel in-flight deploys on the same branch
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Build once, share artifact to all targets
+  # ─────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install
+        working-directory: client
+        run: npm ci --prefer-offline 2>/dev/null || npm install
+
+      - name: Build
+        working-directory: client
+        run: npm run build
+        env:
+          CI: false
+          GENERATE_SOURCEMAP: false
+          # Inject any public env vars here:
+          # REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: client/build
+          retention-days: 1
+
+  # ─────────────────────────────────────────────
+  # Vercel – production deploy via CLI
+  # Secrets needed:
+  #   VERCEL_TOKEN     – Vercel API token
+  #   VERCEL_ORG_ID    – team_xxx
+  #   VERCEL_PROJECT_ID – prj_xxx
+  # ─────────────────────────────────────────────
+  deploy-vercel:
+    name: Deploy → Vercel
+    needs: build
+    runs-on: ubuntu-latest
+    if: >
+      inputs.target == 'all' || inputs.target == 'vercel' ||
+      github.event_name == 'push'
+    environment:
+      name: production-vercel
+      url: ${{ steps.vercel.outputs.url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: client/build
+
+      - name: Deploy to Vercel
+        id: vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+          working-directory: ./
+
+      - name: Post deploy URL to summary
+        run: echo "### ✅ Vercel deployed to ${{ steps.vercel.outputs.preview-url }}" >> $GITHUB_STEP_SUMMARY
+
+  # ─────────────────────────────────────────────
+  # Coolify – trigger via webhook
+  # Secrets needed:
+  #   COOLIFY_WEBHOOK_URL – full webhook URL from Coolify app settings
+  #   COOLIFY_TOKEN       – Coolify API token (optional, for Bearer auth)
+  # ─────────────────────────────────────────────
+  deploy-coolify:
+    name: Deploy → Coolify
+    needs: build
+    runs-on: ubuntu-latest
+    if: >
+      inputs.target == 'all' || inputs.target == 'coolify' ||
+      github.event_name == 'push'
+    steps:
+      - name: Trigger Coolify webhook deploy
+        run: |
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${{ secrets.COOLIFY_WEBHOOK_URL }}" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"force":false}')
+
+          echo "Coolify webhook response: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -lt 200 ] || [ "$HTTP_STATUS" -ge 300 ]; then
+            echo "::error::Coolify deploy webhook failed with HTTP $HTTP_STATUS"
+            exit 1
+          fi
+          echo "### ✅ Coolify deploy triggered (HTTP $HTTP_STATUS)" >> $GITHUB_STEP_SUMMARY
+
+  # ─────────────────────────────────────────────
+  # Hostinger VPS – SSH deploy
+  # Secrets needed:
+  #   VPS_HOST       – your VPS IP or hostname
+  #   VPS_USER       – SSH user (e.g. root or ubuntu)
+  #   VPS_SSH_KEY    – private SSH key (full PEM content)
+  #   VPS_APP_DIR    – path on server, e.g. /var/www/myapp
+  #   VPS_PM2_NAME   – pm2 process name (optional, for Node apps)
+  # ─────────────────────────────────────────────
+  deploy-vps:
+    name: Deploy → Hostinger VPS
+    needs: build
+    runs-on: ubuntu-latest
+    if: >
+      inputs.target == 'all' || inputs.target == 'vps' ||
+      github.event_name == 'push'
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: build-output
+
+      - name: Copy build to VPS via rsync
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+          switches: -avzr --delete
+          path: build-output/
+          remote_path: ${{ secrets.VPS_APP_DIR }}/public
+          remote_host: ${{ secrets.VPS_HOST }}
+          remote_user: ${{ secrets.VPS_USER }}
+          remote_key: ${{ secrets.VPS_SSH_KEY }}
+
+      - name: Reload nginx / pm2 on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+            # Reload nginx to pick up any config changes
+            sudo nginx -t && sudo systemctl reload nginx
+
+            # If there's a Node.js backend, restart pm2
+            if [ -n "${{ secrets.VPS_PM2_NAME }}" ]; then
+              cd ${{ secrets.VPS_APP_DIR }}
+              git pull origin main --ff-only
+              npm ci --omit=dev
+              pm2 reload ${{ secrets.VPS_PM2_NAME }} --update-env || pm2 start ecosystem.config.js
+            fi
+            echo "VPS deploy complete"
+
+      - name: Summary
+        run: echo "### ✅ VPS deployed to ${{ secrets.VPS_HOST }}" >> $GITHUB_STEP_SUMMARY
+
+  # ─────────────────────────────────────────────
+  # Cloudflare Pages (or Workers)
+  # Secrets needed:
+  #   CLOUDFLARE_API_TOKEN  – token with Pages:Edit permission
+  #   CLOUDFLARE_ACCOUNT_ID – your CF account ID
+  #   CLOUDFLARE_PROJECT_NAME – Pages project name
+  # ─────────────────────────────────────────────
+  deploy-cloudflare:
+    name: Deploy → Cloudflare Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: >
+      inputs.target == 'all' || inputs.target == 'cloudflare' ||
+      github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: client/build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          directory: client/build
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          wranglerVersion: '3'
+
+      - name: Summary
+        run: echo "### ✅ Cloudflare Pages deployed" >> $GITHUB_STEP_SUMMARY
+
+  # ─────────────────────────────────────────────
+  # Post-deploy smoke test (runs after all targets)
+  # ─────────────────────────────────────────────
+  smoke-test:
+    name: Post-deploy 404 check
+    needs: [deploy-vercel, deploy-coolify, deploy-vps, deploy-cloudflare]
+    if: always() && needs.deploy-vercel.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install linkinator
+        run: npm install -g linkinator
+
+      - name: Check live URL for 404s
+        env:
+          DEPLOY_URL: ${{ needs.deploy-vercel.outputs.url || secrets.PRODUCTION_URL }}
+        run: |
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "No deploy URL – skipping smoke test"
+            exit 0
+          fi
+          linkinator "$DEPLOY_URL" \
+            --recurse \
+            --timeout 10000 \
+            --retry 3 \
+            --skip "^mailto:" \
+            --format CSV \
+            --output smoke-report.csv
+          echo "### ✅ Smoke test passed for $DEPLOY_URL" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-report
+          path: smoke-report.csv
+          retention-days: 7
