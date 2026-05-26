@@ -44,3 +44,4 @@ coverage/
 .pytest_cache/
 
 package-lock.json
+client/tsconfig.tsbuildinfo

@@ -1,20 +1,57 @@
 {
-  "Engineer": {
-    "avatar": "/avatars_generated/Engineer.glb",
-    "voice": "en-us",
-    "seat": 1,
-    "style": "cartoon"
-  },
-  "Researcher": {
-    "avatar": "/avatars_generated/Researcher.glb",
-    "voice": "en-sc",
-    "seat": 2,
-    "style": "realistic"
-  },
   "Strategist": {
+    "id": "agent_zero",
     "avatar": "/avatars_generated/Strategist.glb",
     "voice": "en",
     "seat": 0,
-    "style": "semi_realistic"
+    "style": "semi_realistic",
+    "name": "Agent Zero",
+    "codename": "AZ-001",
+    "role": "Root Orchestrator",
+    "color": "#6366f1"
+  },
+  "Engineer": {
+    "id": "devika",
+    "avatar": "/avatars_generated/Engineer.glb",
+    "voice": "en-us",
+    "seat": 1,
+    "style": "cartoon",
+    "name": "Devika",
+    "codename": "DVK-002",
+    "role": "Lead Delegator",
+    "color": "#06b6d4"
+  },
+  "Researcher": {
+    "id": "marco",
+    "avatar": "/avatars_generated/Researcher.glb",
+    "voice": "en-sc",
+    "seat": 2,
+    "style": "realistic",
+    "name": "Marco",
+    "codename": "MRC-001",
+    "role": "Analytical Reasoner",
+    "color": "#8b5cf6"
+  },
+  "Creative": {
+    "id": "darya",
+    "avatar": "/avatars_generated/Creative.glb",
+    "voice": "en-gb",
+    "seat": 3,
+    "style": "stylized",
+    "name": "DARYA",
+    "codename": "DRY-004",
+    "role": "Creative Director",
+    "color": "#ec4899"
+  },
+  "Safety": {
+    "id": "cynthia",
+    "avatar": "/avatars_generated/Safety.glb",
+    "voice": "en-au",
+    "seat": 4,
+    "style": "semi_realistic",
+    "name": "Cynthia",
+    "codename": "CYN-007",
+    "role": "Safety & Observability",
+    "color": "#f59e0b"
   }
 }

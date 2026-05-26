@@ -4,17 +4,36 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
+/* ── Design Tokens ─────────────────────────────────────── */
 :root {
   --surface-950: #0d0815;
   --surface-900: #150f24;
   --surface-800: #1e1533;
+  --surface-700: #2a1f44;
   --coral-500: #e87040;
+  --coral-400: #f0845c;
   --violet-500: #8b5cf6;
+  --violet-400: #a78bfa;
   --gold-500: #d4af37;
+  --gold-400: #e8c547;
   --text-primary: #ede9f5;
   --text-secondary: #9b8fb8;
+
+  /* Pi Fleet Agent Colors */
+  --pi-marco: #8b5cf6;
+  --pi-luna: #e87040;
+  --pi-pauli: #d4af37;
+  --pi-darya: #ec4899;
+  --pi-devika: #06b6d4;
+  --pi-synthia: #10b981;
+  --pi-cynthia: #f59e0b;
+  --pi-zero: #6366f1;
+
+  /* Sphere visualization */
+  --orb-glow: rgba(139, 92, 246, 0.4);
 }
 
+/* ── Base ──────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -39,22 +58,22 @@ body {
   color: #fff;
 }
 
-/* Scrollbar */
+/* ── Scrollbar ─────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--surface-950);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgba(139, 92, 246, 0.25);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.45);
 }
 
-/* Scroll reveal utility */
+/* ── Scroll reveal ─────────────────────────────────────── */
 .reveal-hidden {
   opacity: 0;
   transform: translateY(24px);
@@ -67,7 +86,7 @@ body {
   filter: blur(0);
 }
 
-/* Typing cursor animation */
+/* ── Typing cursor ─────────────────────────────────────── */
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
@@ -78,7 +97,7 @@ body {
   color: var(--coral-500);
 }
 
-/* Agent bubble animations */
+/* ── Message bubble slide animations ──────────────────── */
 .agent-bubble-left {
   animation: slideFromLeft 0.4s ease-out forwards;
 }
@@ -94,10 +113,54 @@ body {
   100% { opacity: 1; transform: translateX(0); }
 }
 
-/* Canvas container */
+/* ── Sphere / Orb Animations ───────────────────────────── */
+@keyframes orbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+@keyframes orbPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.07); }
+}
+
+@keyframes orbRingExpand {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes orbGlowBreath {
+  0%, 100% { box-shadow: 0 0 12px var(--orb-glow), 0 0 24px var(--orb-glow); }
+  50% { box-shadow: 0 0 22px var(--orb-glow), 0 0 44px var(--orb-glow); }
+}
+
+.orb-float {
+  animation: orbFloat 5s ease-in-out infinite;
+}
+.orb-pulse-speaking {
+  animation: orbPulse 0.7s ease-in-out infinite;
+}
+.orb-glow-breath {
+  animation: orbGlowBreath 3s ease-in-out infinite;
+}
+
+/* ── Canvas container ──────────────────────────────────── */
 .canvas-container {
   position: relative;
 }
 .canvas-container canvas {
   display: block;
+}
+
+/* ── Fleet card hover effect ───────────────────────────── */
+.fleet-card {
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+}
+.fleet-card:hover {
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.15), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Settings toggle ───────────────────────────────────── */
+.toggle-thumb {
+  transition: left 0.15s ease;
 }

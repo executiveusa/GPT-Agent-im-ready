@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useLanguage } from '@/lib/language-context';
 import { LanguageToggle } from './language-toggle';
 import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Layers, Settings } from 'lucide-react';
 
 export function Navbar() {
   const { t } = useLanguage();
@@ -13,6 +13,7 @@ export function Navbar() {
   const links = [
     { href: '/', label: t('nav.home') },
     { href: '/council', label: t('nav.council') },
+    { href: '/fleet', label: t('nav.fleet') },
     { href: '/#viewing-room', label: t('nav.viewingRoom') },
     { href: '/#about', label: t('nav.about') },
   ];
@@ -28,10 +29,13 @@ export function Navbar() {
           <span className="font-display text-lg font-semibold text-violet-400 tracking-tight">
             I&apos;m Ready
           </span>
+          <span className="hidden sm:block text-[10px] font-mono text-[#9b8fb8]/50 border border-violet-900/30 px-1.5 py-0.5 rounded">
+            Pi Fleet
+          </span>
         </Link>
 
         {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-6">
           {links.map((link) => (
             <Link
               key={link.href}
@@ -42,6 +46,13 @@ export function Navbar() {
             </Link>
           ))}
           <LanguageToggle />
+          <Link
+            href="/settings"
+            className="flex items-center gap-1.5 p-2 rounded-lg text-[#9b8fb8] hover:text-[#ede9f5] hover:bg-surface-800/60 transition-colors"
+            title="Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </Link>
         </div>
 
         {/* Mobile toggle */}
@@ -67,6 +78,13 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/settings"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2 text-sm text-[#9b8fb8] hover:text-[#ede9f5] px-2 py-1"
+          >
+            <Settings className="w-4 h-4" /> Settings
+          </Link>
           <div className="px-2 pt-2">
             <LanguageToggle />
           </div>

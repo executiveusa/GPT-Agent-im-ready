@@ -1,94 +1,103 @@
 /**
- * LLM Council Logic — Karpathy Method
- * 3-stage reasoning pipeline: Parallel Response → Peer Ranking → Synthesis
+ * LLM Council Logic — Pi Multi-Agent Runtime
+ * 3-stage pipeline: Parallel Response → Peer Ranking → Synthesis
+ * Supports any agent pair from the Pi fleet.
  */
+
+import { getAgent, AGENTS, type AgentDefinition } from './agents';
 
 export interface AgentMessage {
   id: string;
-  agent: 'marco' | 'luna' | 'council';
+  agent: string;
+  agentName: string;
+  agentColor: string;
   content: string;
   timestamp: number;
   stage?: 'response' | 'ranking' | 'synthesis';
+  provider?: string;
 }
 
 export interface CouncilState {
   messages: AgentMessage[];
   isProcessing: boolean;
   currentStage: 'idle' | 'stage1' | 'stage2' | 'stage3';
-  mode: 'debate' | 'podcast' | 'design' | 'plan';
+  mode: CouncilMode;
 }
 
-export type CouncilMode = CouncilState['mode'];
+export type CouncilMode = 'debate' | 'podcast' | 'design' | 'plan';
 
-const AGENT_PERSONAS = {
-  marco: {
-    name: 'Marco',
-    role: 'Analytical Reasoner',
-    systemPrompt: `You are Marco, a sharp analytical male AI agent. You approach problems 
-with logic, data, and structured reasoning. You speak with confidence and precision. 
-You respectfully challenge assumptions. Keep responses conversational and under 150 words.
-You're having a live conversation with Luna, a creative thinker.`,
-  },
-  luna: {
-    name: 'Luna',
-    role: 'Creative Thinker',
-    systemPrompt: `You are Luna, an imaginative and emotionally intelligent female AI agent.
-You approach problems with creativity, intuition, and human-centered thinking. You speak 
-with warmth and insight. You bring unexpected angles to discussions. Keep responses 
-conversational and under 150 words. You're having a live conversation with Marco, 
-an analytical reasoner.`,
-  },
-};
+export interface CouncilSettings {
+  openaiKey?: string;
+  anthropicKey?: string;
+  defaultProvider?: string;
+}
 
 const MODE_PROMPTS: Record<CouncilMode, string> = {
-  debate: 'Have a structured debate exploring both sides. Challenge each other respectfully.',
+  debate: 'Have a structured debate exploring multiple sides. Challenge each other respectfully with evidence.',
   podcast: 'Have a natural podcast-style conversation. Be entertaining, insightful, and engaging like co-hosts.',
-  design: 'Collaborate on a design solution. Iterate on each other\'s ideas constructively.',
-  plan: 'Work together to create a detailed plan. Build on each other\'s suggestions.',
+  design: 'Collaborate on a design or creative solution. Iterate on each other\'s ideas constructively.',
+  plan: 'Work together to create a detailed action plan. Build on each other\'s suggestions step by step.',
 };
 
 function generateId(): string {
   return `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
+async function callAgent(
+  agent: AgentDefinition,
+  prompt: string,
+  settings?: CouncilSettings
+): Promise<string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (settings?.openaiKey) headers['x-openai-key'] = settings.openaiKey;
+  if (settings?.anthropicKey) headers['x-anthropic-key'] = settings.anthropicKey;
+
+  const response = await fetch('/api/agent', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      prompt,
+      agentId: agent.id,
+      providerOverride: settings?.defaultProvider !== 'demo' ? undefined : 'demo',
+    }),
+  });
+
+  if (!response.ok) throw new Error(`Agent ${agent.id} failed: ${response.statusText}`);
+  const data = await response.json();
+  return data.content || 'No response generated.';
+}
+
 /**
- * Stage 1: Get independent responses from both agents
+ * Stage 1: Independent parallel responses from both agents
  */
-export async function stage1ParallelResponses(
+async function stage1ParallelResponses(
   topic: string,
   mode: CouncilMode,
   conversationHistory: AgentMessage[],
+  agent1: AgentDefinition,
+  agent2: AgentDefinition,
   onMessage: (msg: AgentMessage) => void,
-): Promise<{ marcoResponse: string; lunaResponse: string }> {
+  settings?: CouncilSettings
+): Promise<{ response1: string; response2: string }> {
   const historyContext = conversationHistory
     .slice(-10)
-    .map((m) => `${m.agent === 'marco' ? 'Marco' : m.agent === 'luna' ? 'Luna' : 'Council'}: ${m.content}`)
+    .map((m) => `${m.agentName}: ${m.content}`)
     .join('\n');
 
   const modeInstruction = MODE_PROMPTS[mode];
 
-  const makeRequest = async (agent: 'marco' | 'luna') => {
-    const persona = AGENT_PERSONAS[agent];
-    const prompt = historyContext
-      ? `${persona.systemPrompt}\n\nMode: ${modeInstruction}\n\nConversation so far:\n${historyContext}\n\nTopic: ${topic}\n\nContinue the conversation naturally:`
-      : `${persona.systemPrompt}\n\nMode: ${modeInstruction}\n\nTopic: ${topic}\n\nStart the conversation:`;
+  const buildPrompt = (agent: AgentDefinition, partner: AgentDefinition) =>
+    historyContext
+      ? `${agent.systemPrompt}\n\nMode: ${modeInstruction}\n\nYou are talking with ${partner.name} (${partner.role}).\n\nConversation so far:\n${historyContext}\n\nTopic: ${topic}\n\nContinue the conversation naturally:`
+      : `${agent.systemPrompt}\n\nMode: ${modeInstruction}\n\nYou are talking with ${partner.name} (${partner.role}).\n\nTopic: ${topic}\n\nStart the conversation:`;
 
-    const response = await fetch('/api/council', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, agent }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Agent ${agent} failed: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const content = data.content || data.message || 'No response generated.';
-
+  const makeRequest = async (agent: AgentDefinition, partner: AgentDefinition): Promise<string> => {
+    const content = await callAgent(agent, buildPrompt(agent, partner), settings);
     const msg: AgentMessage = {
       id: generateId(),
-      agent,
+      agent: agent.id,
+      agentName: agent.name,
+      agentColor: agent.color,
       content,
       timestamp: Date.now(),
       stage: 'response',
@@ -97,83 +106,97 @@ export async function stage1ParallelResponses(
     return content;
   };
 
-  const [marcoResponse, lunaResponse] = await Promise.all([
-    makeRequest('marco'),
-    makeRequest('luna'),
+  const [response1, response2] = await Promise.all([
+    makeRequest(agent1, agent2),
+    makeRequest(agent2, agent1),
   ]);
 
-  return { marcoResponse, lunaResponse };
+  return { response1, response2 };
 }
 
 /**
- * Stage 2: Peer ranking (simplified for real-time UX)
- * Each agent evaluates the other's response
+ * Stage 2: Peer ranking — each agent evaluates the other's response
  */
-export async function stage2PeerRanking(
+async function stage2PeerRanking(
   topic: string,
-  marcoResponse: string,
-  lunaResponse: string,
-): Promise<{ marcoRank: string; lunaRank: string }> {
-  const rankPrompt = (evaluator: 'marco' | 'luna', otherResponse: string, otherName: string) => {
-    const persona = AGENT_PERSONAS[evaluator];
-    return `${persona.systemPrompt}\n\nYou just discussed: "${topic}"\n\n${otherName} said: "${otherResponse}"\n\nBriefly acknowledge their point and rate it 1-10 for insight. Then share what you'd add or change. Keep it under 80 words.`;
-  };
+  agent1: AgentDefinition,
+  agent2: AgentDefinition,
+  response1: string,
+  response2: string,
+  onMessage: (msg: AgentMessage) => void,
+  settings?: CouncilSettings
+): Promise<{ rank1: string; rank2: string }> {
+  const rankPrompt = (evaluator: AgentDefinition, other: AgentDefinition, otherResponse: string) =>
+    `${evaluator.systemPrompt}\n\nYou just discussed: "${topic}"\n\n${other.name} said: "${otherResponse}"\n\nBriefly acknowledge their key point, rate it 1-10 for insight, and share what you'd add or challenge. Under 80 words.`;
 
-  const [marcoEval, lunaEval] = await Promise.all([
-    fetch('/api/council', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: rankPrompt('marco', lunaResponse, 'Luna'),
-        agent: 'marco',
-      }),
-    }).then((r) => r.json()),
-    fetch('/api/council', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt: rankPrompt('luna', marcoResponse, 'Marco'),
-        agent: 'luna',
-      }),
-    }).then((r) => r.json()),
+  const [eval1, eval2] = await Promise.all([
+    callAgent(agent1, rankPrompt(agent1, agent2, response2), settings),
+    callAgent(agent2, rankPrompt(agent2, agent1, response1), settings),
   ]);
 
-  return {
-    marcoRank: marcoEval.content || 'Interesting perspective.',
-    lunaRank: lunaEval.content || 'Good analysis.',
-  };
+  onMessage({
+    id: generateId(),
+    agent: agent1.id,
+    agentName: agent1.name,
+    agentColor: agent1.color,
+    content: eval1,
+    timestamp: Date.now(),
+    stage: 'ranking',
+  });
+
+  onMessage({
+    id: generateId(),
+    agent: agent2.id,
+    agentName: agent2.name,
+    agentColor: agent2.color,
+    content: eval2,
+    timestamp: Date.now(),
+    stage: 'ranking',
+  });
+
+  return { rank1: eval1, rank2: eval2 };
 }
 
 /**
  * Stage 3: Council synthesis — combine both perspectives
  */
-export async function stage3Synthesis(
+async function stage3Synthesis(
   topic: string,
-  marcoResponse: string,
-  lunaResponse: string,
-  marcoRank: string,
-  lunaRank: string,
-): Promise<string> {
-  const synthesisPrompt = `You are the Council Moderator synthesizing a discussion between Marco (analytical) and Luna (creative).
+  agent1: AgentDefinition,
+  agent2: AgentDefinition,
+  response1: string,
+  response2: string,
+  rank1: string,
+  rank2: string,
+  onMessage: (msg: AgentMessage) => void,
+  settings?: CouncilSettings
+): Promise<void> {
+  const synthesisPrompt = `You are the Council Moderator synthesizing a discussion between ${agent1.name} (${agent1.role}) and ${agent2.name} (${agent2.role}).
 
 Topic: "${topic}"
 
-Marco's position: "${marcoResponse}"
-Luna's position: "${lunaResponse}"
+${agent1.name}'s position: "${response1}"
+${agent2.name}'s position: "${response2}"
 
-Marco's evaluation of Luna: "${marcoRank}"
-Luna's evaluation of Marco: "${lunaRank}"
+${agent1.name}'s evaluation: "${rank1}"
+${agent2.name}'s evaluation: "${rank2}"
 
-Synthesize their discussion into a clear, actionable conclusion that honors both perspectives. Highlight key agreements and productive tensions. Keep it under 120 words.`;
+Synthesize into a clear, actionable conclusion that honors both perspectives. Highlight key agreements and productive tensions. Under 120 words.`;
 
-  const response = await fetch('/api/council', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: synthesisPrompt, agent: 'council' }),
+  const synthesis = await callAgent(AGENTS.marco, synthesisPrompt, {
+    ...settings,
+    defaultProvider: settings?.defaultProvider,
   });
 
-  const data = await response.json();
-  return data.content || 'The council has reached consensus.';
+  onMessage({
+    id: generateId(),
+    agent: 'council',
+    agentName: 'Council',
+    agentColor: '#d4af37',
+    content: synthesis,
+    timestamp: Date.now(),
+    stage: 'synthesis',
+  });
 }
 
 /**
@@ -185,48 +208,26 @@ export async function runCouncilRound(
   history: AgentMessage[],
   onMessage: (msg: AgentMessage) => void,
   onStageChange: (stage: CouncilState['currentStage']) => void,
+  agentIds: { agent1Id: string; agent2Id: string } = { agent1Id: 'marco', agent2Id: 'luna' },
+  settings?: CouncilSettings
 ): Promise<void> {
-  // Stage 1
+  const agent1 = getAgent(agentIds.agent1Id) ?? AGENTS.marco;
+  const agent2 = getAgent(agentIds.agent2Id) ?? AGENTS.luna;
+
   onStageChange('stage1');
-  const { marcoResponse, lunaResponse } = await stage1ParallelResponses(
-    topic, mode, history, onMessage,
+  const { response1, response2 } = await stage1ParallelResponses(
+    topic, mode, history, agent1, agent2, onMessage, settings
   );
 
-  // Stage 2
   onStageChange('stage2');
-  const { marcoRank, lunaRank } = await stage2PeerRanking(
-    topic, marcoResponse, lunaResponse,
+  const { rank1, rank2 } = await stage2PeerRanking(
+    topic, agent1, agent2, response1, response2, onMessage, settings
   );
 
-  // Emit ranking messages
-  onMessage({
-    id: generateId(),
-    agent: 'marco',
-    content: marcoRank,
-    timestamp: Date.now(),
-    stage: 'ranking',
-  });
-  onMessage({
-    id: generateId(),
-    agent: 'luna',
-    content: lunaRank,
-    timestamp: Date.now(),
-    stage: 'ranking',
-  });
-
-  // Stage 3
   onStageChange('stage3');
-  const synthesis = await stage3Synthesis(
-    topic, marcoResponse, lunaResponse, marcoRank, lunaRank,
+  await stage3Synthesis(
+    topic, agent1, agent2, response1, response2, rank1, rank2, onMessage, settings
   );
-
-  onMessage({
-    id: generateId(),
-    agent: 'council',
-    content: synthesis,
-    timestamp: Date.now(),
-    stage: 'synthesis',
-  });
 
   onStageChange('idle');
 }
