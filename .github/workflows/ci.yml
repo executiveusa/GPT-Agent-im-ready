@@ -128,21 +128,30 @@ jobs:
           npx next start -p 3001 &
           SERVER_PID=$!
 
-          # Wait for the server to be ready
-          for i in $(seq 1 15); do
+          # Wait up to 30 s for the server to be ready
+          READY=0
+          for i in $(seq 1 30); do
             if curl -sf http://localhost:3001 > /dev/null 2>&1; then
               echo "Server ready after ${i}s"
+              READY=1
               break
             fi
             sleep 1
           done
 
-          # Check all internal links; skip external URLs and API routes
+          if [ "$READY" = "0" ]; then
+            echo "::error::Next.js server did not start within 30 s"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
+
+          # Check internal HTML links only.
+          # Skip: external URLs, mailto, and API routes (POST-only, return 405 on GET).
           linkinator http://localhost:3001 \
             --recurse \
             --timeout 10000 \
             --retry 2 \
-            --skip "^(mailto:|https?://(?!localhost))" \
+            --skip "^(mailto:|https?://(?!localhost)|http://localhost:3001/api)" \
             --format CSV \
             --output ../link-report.csv || LINK_EXIT=$?
 
