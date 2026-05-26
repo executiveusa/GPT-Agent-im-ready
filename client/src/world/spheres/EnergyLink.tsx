@@ -12,7 +12,7 @@ interface EnergyLinkProps {
 }
 
 export function EnergyLink({ edge, spheres, intensity }: EnergyLinkProps) {
-  const lineRef = useRef<THREE.Line>(null);
+  const lineRef = useRef<THREE.Line | null>(null);
 
   // Hooks must be called unconditionally, before any early returns
   useFrame((state) => {
@@ -41,6 +41,7 @@ export function EnergyLink({ edge, spheres, intensity }: EnergyLinkProps) {
   const geometry = new THREE.BufferGeometry().setFromPoints(points);
 
   return (
+    // @ts-expect-error React Three Fiber JSX element type
     <line ref={lineRef} geometry={geometry}>
       <lineBasicMaterial color={fromSphere.glowColor} transparent opacity={intensity} linewidth={2} />
     </line>

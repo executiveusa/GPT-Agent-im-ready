@@ -1,10 +1,8 @@
 'use client';
 
-import { useContext } from 'react';
 import { SphereCouncilCanvas } from '@/world/spheres/SphereCouncilCanvas';
 import { AGENTS } from '@/lib/agents';
 import { useSettings } from '@/lib/settings-store';
-import { CouncilMessagesContext } from './council-chat';
 
 /**
  * Wrapper that connects the sphere visualization to council state

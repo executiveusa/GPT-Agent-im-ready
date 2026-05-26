@@ -5,7 +5,7 @@
  */
 
 import { getAgent, AGENTS, type AgentDefinition } from './agents';
-import { resolveProvider, type ProviderResolutionContext } from './provider-routing';
+import { resolveProvider, type ProviderResolutionContext, type ApiProvider } from './provider-routing';
 
 export interface AgentMessage {
   id: string;
@@ -32,7 +32,8 @@ export type CouncilMode = 'debate' | 'podcast' | 'design' | 'plan';
 export interface CouncilSettings {
   openaiKey?: string;
   anthropicKey?: string;
-  defaultProvider?: string;
+  defaultProvider?: ApiProvider;
+  demoModeLocked?: boolean;
 }
 
 const MODE_PROMPTS: Record<CouncilMode, string> = {

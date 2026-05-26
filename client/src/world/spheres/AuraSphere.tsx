@@ -26,10 +26,11 @@ export function AuraSphere({ node }: AuraSphereProps) {
     }
 
     // Glow intensity based on speaking state
-    if (glowRef.current) {
+    if (glowRef.current && glowRef.current.material instanceof THREE.Material) {
+      const material = glowRef.current.material as THREE.MeshStandardMaterial;
       const baseIntensity = node.isSpeaking ? 1.2 : 0.6;
       const pulse = node.isSpeaking ? Math.sin(t * 6) * 0.4 : 0;
-      glowRef.current.material.emissiveIntensity = baseIntensity + pulse;
+      material.emissiveIntensity = baseIntensity + pulse;
     }
 
     // Sphere expansion when speaking
@@ -47,10 +48,12 @@ export function AuraSphere({ node }: AuraSphereProps) {
       {/* Glow layer */}
       <mesh ref={glowRef} scale={node.baseRadius * 1.3}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshBasicMaterial
+        <meshStandardMaterial
           color={glowColor}
           emissive={glowColor}
           emissiveIntensity={0.6}
+          metalness={0}
+          roughness={1}
           transparent
           opacity={0.3}
         />
