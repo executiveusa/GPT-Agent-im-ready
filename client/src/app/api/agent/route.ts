@@ -5,73 +5,133 @@ const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
 const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const ANTHROPIC_VERSION = '2023-06-01';
 
+function generateRequestId(): string {
+  return `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
 export async function POST(request: NextRequest) {
+  const requestId = generateRequestId();
+
   try {
     const body = await request.json();
-    const {
-      prompt,
-      agentId = 'marco',
-      providerOverride,
-      modelOverride,
-    } = body;
+    const { prompt, agentId = 'marco', providerOverride, allowDemoFallback = false } = body;
 
     if (!prompt || typeof prompt !== 'string') {
-      return NextResponse.json({ error: 'Missing prompt' }, { status: 400 });
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: 'missing_prompt',
+            message: 'Request missing required field: prompt',
+          },
+          requestId,
+        },
+        { status: 400 }
+      );
     }
 
     const clientOpenaiKey = request.headers.get('x-openai-key') || '';
     const clientAnthropicKey = request.headers.get('x-anthropic-key') || '';
-    const openaiKey = clientOpenaiKey || process.env.OPENAI_API_KEY || '';
-    const anthropicKey = clientAnthropicKey || process.env.ANTHROPIC_API_KEY || '';
+    const serverOpenaiKey = process.env.OPENAI_API_KEY || '';
+    const serverAnthropicKey = process.env.ANTHROPIC_API_KEY || '';
+
+    const openaiKey = clientOpenaiKey || serverOpenaiKey;
+    const anthropicKey = clientAnthropicKey || serverAnthropicKey;
 
     const agent: AgentDefinition | undefined = getAgent(agentId) ?? AGENTS.marco;
     const provider = providerOverride ?? agent.provider;
-    const model = modelOverride ?? agent.model;
 
-    const effectiveProvider =
-      provider === 'anthropic' && anthropicKey
-        ? 'anthropic'
-        : provider === 'openai' && openaiKey
-        ? 'openai'
-        : openaiKey
-        ? 'openai'
-        : anthropicKey
-        ? 'anthropic'
-        : 'demo';
+    // Determine effective provider
+    let effectiveProvider: 'openai' | 'anthropic' | 'demo';
+    let keySource: 'server-env' | 'browser-local' | 'none' = 'none';
 
+    if (provider === 'demo') {
+      effectiveProvider = 'demo';
+    } else if (provider === 'anthropic' && anthropicKey) {
+      effectiveProvider = 'anthropic';
+      keySource = clientAnthropicKey ? 'browser-local' : 'server-env';
+    } else if (provider === 'openai' && openaiKey) {
+      effectiveProvider = 'openai';
+      keySource = clientOpenaiKey ? 'browser-local' : 'server-env';
+    } else if (openaiKey) {
+      effectiveProvider = 'openai';
+      keySource = clientOpenaiKey ? 'browser-local' : 'server-env';
+    } else if (anthropicKey) {
+      effectiveProvider = 'anthropic';
+      keySource = clientAnthropicKey ? 'browser-local' : 'server-env';
+    } else {
+      effectiveProvider = 'demo';
+    }
+
+    // If provider was requested but no key available, return error (unless demo is allowed)
+    if (provider !== 'demo' && effectiveProvider === 'demo' && !allowDemoFallback) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            provider: provider,
+            status: 401,
+            code: 'missing_api_key',
+            message: `No valid API key found for provider: ${provider}. Add key in Settings or set server env variable.`,
+          },
+          requestId,
+        },
+        { status: 401 }
+      );
+    }
+
+    // Handle demo mode
     if (effectiveProvider === 'demo') {
       return NextResponse.json({
+        ok: true,
         content: getDemoResponse(agentId, prompt),
         agentId,
         model: 'demo',
-        provider: 'demo',
+        provider: 'demo-mode',
+        requestId,
       });
     }
 
+    // Call real provider
     if (effectiveProvider === 'anthropic') {
       return callAnthropic({
         prompt,
         systemPrompt: agent.systemPrompt,
-        model,
+        model: agent.model,
         temperature: agent.temperature,
         maxTokens: agent.maxTokens,
         apiKey: anthropicKey,
         agentId,
+        requestId,
+        allowDemoFallback,
       });
     }
 
     return callOpenAI({
       prompt,
       systemPrompt: agent.systemPrompt,
-      model,
+      model: agent.model,
       temperature: agent.temperature,
       maxTokens: agent.maxTokens,
       apiKey: openaiKey,
       agentId,
+      requestId,
+      allowDemoFallback,
     });
   } catch (err) {
-    console.error('[/api/agent] error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error(`[/api/agent] ${requestId} error:`, err);
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          code: 'internal_error',
+          message: 'Internal server error. Check logs.',
+        },
+        requestId,
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -83,6 +143,8 @@ interface CallParams {
   maxTokens: number;
   apiKey: string;
   agentId: string;
+  requestId: string;
+  allowDemoFallback: boolean;
 }
 
 async function callOpenAI(p: CallParams): Promise<NextResponse> {
@@ -103,22 +165,63 @@ async function callOpenAI(p: CallParams): Promise<NextResponse> {
     }),
   });
 
+  const statusText = await res.text();
+
   if (!res.ok) {
-    console.error('[/api/agent] OpenAI error:', await res.text());
-    return NextResponse.json({
-      content: getDemoResponse(p.agentId, p.prompt),
-      agentId: p.agentId,
-      model: 'demo-fallback',
-      provider: 'demo',
-    });
+    console.error(`[/api/agent] ${p.requestId} OpenAI error ${res.status}:`, statusText.slice(0, 200));
+
+    // Try to parse error from OpenAI
+    let errorCode = 'api_error';
+    let errorMessage = 'OpenAI API request failed';
+
+    try {
+      const errorData = JSON.parse(statusText);
+      if (errorData.error?.code) {
+        errorCode = errorData.error.code;
+      }
+      if (errorData.error?.message) {
+        errorMessage = errorData.error.message.slice(0, 200);
+      }
+    } catch {
+      // couldn't parse error
+    }
+
+    // If demo fallback is allowed, return demo
+    if (p.allowDemoFallback) {
+      return NextResponse.json({
+        ok: true,
+        content: getDemoResponse(p.agentId, p.prompt),
+        agentId: p.agentId,
+        model: 'demo-fallback',
+        provider: 'demo-fallback',
+        requestId: p.requestId,
+      });
+    }
+
+    // Otherwise return error
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          provider: 'openai',
+          status: res.status,
+          code: errorCode,
+          message: errorMessage,
+        },
+        requestId: p.requestId,
+      },
+      { status: res.status }
+    );
   }
 
-  const data = await res.json();
+  const data = JSON.parse(statusText);
   return NextResponse.json({
+    ok: true,
     content: data.choices?.[0]?.message?.content ?? 'No response.',
     agentId: p.agentId,
     model: p.model,
     provider: 'openai',
+    requestId: p.requestId,
   });
 }
 
@@ -139,22 +242,63 @@ async function callAnthropic(p: CallParams): Promise<NextResponse> {
     }),
   });
 
+  const statusText = await res.text();
+
   if (!res.ok) {
-    console.error('[/api/agent] Anthropic error:', await res.text());
-    return NextResponse.json({
-      content: getDemoResponse(p.agentId, p.prompt),
-      agentId: p.agentId,
-      model: 'demo-fallback',
-      provider: 'demo',
-    });
+    console.error(`[/api/agent] ${p.requestId} Anthropic error ${res.status}:`, statusText.slice(0, 200));
+
+    // Try to parse error from Anthropic
+    let errorCode = 'api_error';
+    let errorMessage = 'Anthropic API request failed';
+
+    try {
+      const errorData = JSON.parse(statusText);
+      if (errorData.error?.type) {
+        errorCode = errorData.error.type;
+      }
+      if (errorData.error?.message) {
+        errorMessage = errorData.error.message.slice(0, 200);
+      }
+    } catch {
+      // couldn't parse error
+    }
+
+    // If demo fallback is allowed, return demo
+    if (p.allowDemoFallback) {
+      return NextResponse.json({
+        ok: true,
+        content: getDemoResponse(p.agentId, p.prompt),
+        agentId: p.agentId,
+        model: 'demo-fallback',
+        provider: 'demo-fallback',
+        requestId: p.requestId,
+      });
+    }
+
+    // Otherwise return error
+    return NextResponse.json(
+      {
+        ok: false,
+        error: {
+          provider: 'anthropic',
+          status: res.status,
+          code: errorCode,
+          message: errorMessage,
+        },
+        requestId: p.requestId,
+      },
+      { status: res.status }
+    );
   }
 
-  const data = await res.json();
+  const data = JSON.parse(statusText);
   return NextResponse.json({
+    ok: true,
     content: data.content?.[0]?.text ?? 'No response.',
     agentId: p.agentId,
     model: p.model,
     provider: 'anthropic',
+    requestId: p.requestId,
   });
 }
 

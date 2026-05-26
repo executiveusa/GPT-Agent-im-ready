@@ -5,6 +5,7 @@
  */
 
 import { getAgent, AGENTS, type AgentDefinition } from './agents';
+import { resolveProvider, type ProviderResolutionContext } from './provider-routing';
 
 export interface AgentMessage {
   id: string;
@@ -15,6 +16,8 @@ export interface AgentMessage {
   timestamp: number;
   stage?: 'response' | 'ranking' | 'synthesis';
   provider?: string;
+  model?: string;
+  error?: string;
 }
 
 export interface CouncilState {
@@ -47,10 +50,18 @@ async function callAgent(
   agent: AgentDefinition,
   prompt: string,
   settings?: CouncilSettings
-): Promise<string> {
+): Promise<{ content: string; provider: string; model: string; error?: string }> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (settings?.openaiKey) headers['x-openai-key'] = settings.openaiKey;
   if (settings?.anthropicKey) headers['x-anthropic-key'] = settings.anthropicKey;
+
+  // Resolve the provider based on selection and available keys
+  const resolution = resolveProvider({
+    selectedProvider: settings?.defaultProvider,
+    browserOpenaiKey: settings?.openaiKey,
+    browserAnthropicKey: settings?.anthropicKey,
+    demoModeLocked: settings?.demoModeLocked,
+  });
 
   const response = await fetch('/api/agent', {
     method: 'POST',
@@ -58,13 +69,28 @@ async function callAgent(
     body: JSON.stringify({
       prompt,
       agentId: agent.id,
-      providerOverride: settings?.defaultProvider !== 'demo' ? undefined : 'demo',
+      providerOverride: resolution.provider !== 'demo' ? resolution.provider : undefined,
+      allowDemoFallback: resolution.canFallbackToDemo,
     }),
   });
 
-  if (!response.ok) throw new Error(`Agent ${agent.id} failed: ${response.statusText}`);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+    throw new Error(errorData.error?.message || `Agent ${agent.id} failed: ${response.statusText}`);
+  }
+
   const data = await response.json();
-  return data.content || 'No response generated.';
+
+  // Check if the response is an error
+  if (!data.ok) {
+    throw new Error(data.error?.message || 'Agent request failed');
+  }
+
+  return {
+    content: data.content || 'No response generated.',
+    provider: data.provider || 'demo',
+    model: data.model || 'unknown',
+  };
 }
 
 /**
@@ -92,18 +118,20 @@ async function stage1ParallelResponses(
       : `${agent.systemPrompt}\n\nMode: ${modeInstruction}\n\nYou are talking with ${partner.name} (${partner.role}).\n\nTopic: ${topic}\n\nStart the conversation:`;
 
   const makeRequest = async (agent: AgentDefinition, partner: AgentDefinition): Promise<string> => {
-    const content = await callAgent(agent, buildPrompt(agent, partner), settings);
+    const result = await callAgent(agent, buildPrompt(agent, partner), settings);
     const msg: AgentMessage = {
       id: generateId(),
       agent: agent.id,
       agentName: agent.name,
       agentColor: agent.color,
-      content,
+      content: result.content,
       timestamp: Date.now(),
       stage: 'response',
+      provider: result.provider,
+      model: result.model,
     };
     onMessage(msg);
-    return content;
+    return result.content;
   };
 
   const [response1, response2] = await Promise.all([
@@ -129,7 +157,7 @@ async function stage2PeerRanking(
   const rankPrompt = (evaluator: AgentDefinition, other: AgentDefinition, otherResponse: string) =>
     `${evaluator.systemPrompt}\n\nYou just discussed: "${topic}"\n\n${other.name} said: "${otherResponse}"\n\nBriefly acknowledge their key point, rate it 1-10 for insight, and share what you'd add or challenge. Under 80 words.`;
 
-  const [eval1, eval2] = await Promise.all([
+  const [result1, result2] = await Promise.all([
     callAgent(agent1, rankPrompt(agent1, agent2, response2), settings),
     callAgent(agent2, rankPrompt(agent2, agent1, response1), settings),
   ]);
@@ -139,9 +167,11 @@ async function stage2PeerRanking(
     agent: agent1.id,
     agentName: agent1.name,
     agentColor: agent1.color,
-    content: eval1,
+    content: result1.content,
     timestamp: Date.now(),
     stage: 'ranking',
+    provider: result1.provider,
+    model: result1.model,
   });
 
   onMessage({
@@ -149,12 +179,14 @@ async function stage2PeerRanking(
     agent: agent2.id,
     agentName: agent2.name,
     agentColor: agent2.color,
-    content: eval2,
+    content: result2.content,
     timestamp: Date.now(),
     stage: 'ranking',
+    provider: result2.provider,
+    model: result2.model,
   });
 
-  return { rank1: eval1, rank2: eval2 };
+  return { rank1: result1.content, rank2: result2.content };
 }
 
 /**
@@ -183,7 +215,7 @@ ${agent2.name}'s evaluation: "${rank2}"
 
 Synthesize into a clear, actionable conclusion that honors both perspectives. Highlight key agreements and productive tensions. Under 120 words.`;
 
-  const synthesis = await callAgent(AGENTS.marco, synthesisPrompt, {
+  const result = await callAgent(AGENTS.marco, synthesisPrompt, {
     ...settings,
     defaultProvider: settings?.defaultProvider,
   });
@@ -193,9 +225,11 @@ Synthesize into a clear, actionable conclusion that honors both perspectives. Hi
     agent: 'council',
     agentName: 'Council',
     agentColor: '#d4af37',
-    content: synthesis,
+    content: result.content,
     timestamp: Date.now(),
     stage: 'synthesis',
+    provider: result.provider,
+    model: result.model,
   });
 }
 
