@@ -14,11 +14,7 @@ interface EnergyLinkProps {
 export function EnergyLink({ edge, spheres, intensity }: EnergyLinkProps) {
   const lineRef = useRef<THREE.Line>(null);
 
-  const fromSphere = spheres.find((s) => s.id === edge.from);
-  const toSphere = spheres.find((s) => s.id === edge.to);
-
-  if (!fromSphere || !toSphere) return null;
-
+  // Hooks must be called unconditionally, before any early returns
   useFrame((state) => {
     if (!lineRef.current) return;
 
@@ -30,6 +26,11 @@ export function EnergyLink({ edge, spheres, intensity }: EnergyLinkProps) {
     const pulse = Math.sin(t * 3) * 0.2;
     material.opacity = Math.max(0.1, baseOpacity + pulse);
   });
+
+  const fromSphere = spheres.find((s) => s.id === edge.from);
+  const toSphere = spheres.find((s) => s.id === edge.to);
+
+  if (!fromSphere || !toSphere) return null;
 
   // Create curved line between spheres
   const points = [
