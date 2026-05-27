@@ -11,12 +11,12 @@ interface Translations {
 const translations: Translations = {
   // Hero
   'hero.title': {
-    es: 'Estoy Lista Si Tú Estás Listo',
-    en: "I'm Ready If You're Ready",
+    es: 'Consejo de Agentes IA',
+    en: 'AI Agent Council',
   },
   'hero.subtitle': {
-    es: 'Múltiples mentes artificiales. Una plataforma unificada.',
-    en: 'Multiple artificial minds. One unified platform.',
+    es: 'Múltiples inteligencias razonan, debaten y crean juntas en tu sala de comando.',
+    en: 'Multiple intelligences reason, debate, and create together in your command room.',
   },
   'hero.cta': {
     es: 'Entrar al Consejo',

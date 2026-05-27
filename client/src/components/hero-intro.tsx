@@ -13,20 +13,8 @@ export function HeroIntro() {
       {/* Background — deep purple radial */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,#2e1065_0%,#150f24_40%,#0d0815_80%)]" />
 
-      {/* Flower image — positioned bottom-left as the hero anchor */}
-      <div className="absolute bottom-0 left-0 w-[60vw] max-w-[700px] h-[70vh] pointer-events-none select-none">
-        <Image
-          src="/hero-flower.png"
-          alt=""
-          fill
-          className="object-contain object-bottom opacity-90"
-          priority
-          sizes="(max-width: 768px) 90vw, 60vw"
-        />
-        {/* Soft fade edges */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0d0815] via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[#0d0815]/60" />
-      </div>
+      {/* Accent gradient sphere — brand visual */}
+      <div className="absolute bottom-10 left-10 w-80 h-80 rounded-full bg-gradient-to-br from-violet-600/10 to-coral-500/5 blur-3xl pointer-events-none" />
 
       {/* Subtle particle/noise overlay */}
       <div
