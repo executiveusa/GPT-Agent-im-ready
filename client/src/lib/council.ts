@@ -53,10 +53,42 @@ async function callAgent(
   settings?: CouncilSettings
 ): Promise<{ content: string; provider: string; model: string; error?: string }> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+  // Support both legacy and unified routing
+  const useUnifiedRouter = process.env.NEXT_PUBLIC_USE_UNIFIED_ROUTER === 'true';
+
+  if (useUnifiedRouter) {
+    // Route through unified system with BYOK support
+    const response = await fetch('/api/agent-unified', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        agentId: agent.id,
+        prompt,
+        userKey: settings?.openaiKey || settings?.anthropicKey, // BYOK mode
+        model: 'claude-sonnet-4-5',
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error?.message || `Agent ${agent.id} failed: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return {
+      content: data.content || '',
+      provider: data.provider || 'unknown',
+      model: data.model || 'unknown',
+      error: data.error?.message,
+    };
+  }
+
+  // Legacy routing via original /api/agent endpoint
   if (settings?.openaiKey) headers['x-openai-key'] = settings.openaiKey;
   if (settings?.anthropicKey) headers['x-anthropic-key'] = settings.anthropicKey;
 
-  // Resolve the provider based on selection and available keys
   const resolution = resolveProvider({
     selectedProvider: settings?.defaultProvider,
     browserOpenaiKey: settings?.openaiKey,
