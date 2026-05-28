@@ -89,6 +89,7 @@ async function callAgent(
   if (settings?.openaiKey) headers['x-openai-key'] = settings.openaiKey;
   if (settings?.anthropicKey) headers['x-anthropic-key'] = settings.anthropicKey;
 
+  // Resolve the provider based on selection and available keys
   const resolution = resolveProvider({
     selectedProvider: settings?.defaultProvider,
     browserOpenaiKey: settings?.openaiKey,
