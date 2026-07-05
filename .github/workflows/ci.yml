@@ -88,6 +88,7 @@ jobs:
         with:
           name: build-output
           # Next.js outputs to .next/ (not build/)
+          include-hidden-files: true
           path: client/.next
           retention-days: 1
 
@@ -145,15 +146,99 @@ jobs:
             exit 1
           fi
 
-          # Check internal HTML links only.
-          # Skip: external URLs, mailto, and API routes (POST-only, return 405 on GET).
-          linkinator http://localhost:3001 \
-            --recurse \
-            --timeout 10000 \
-            --retry 2 \
-            --skip "^(mailto:|https?://(?!localhost)|http://localhost:3001/api)" \
-            --format CSV \
-            --output ../link-report.csv || LINK_EXIT=$?
+          # Check the primary HTML routes only.
+          # The generic crawler was following Next.js asset internals, so we
+          # keep this focused on real page links from the rendered HTML.
+          LINK_EXIT=0
+          node --input-type=module <<'NODE' || LINK_EXIT=$?
+          import { writeFileSync } from 'node:fs';
+
+          const base = new URL('http://localhost:3001');
+          const pages = ['/', '/council', '/fleet', '/settings'];
+          const anchorChecks = new Map([
+            ['/', ['about', 'viewing-room']],
+          ]);
+          const rows = ['url,status,state,parent,failureDetails'];
+          const checked = new Set();
+          let hasFailure = false;
+
+          const escapeCsv = (value) => {
+            const text = String(value ?? '');
+            return `"${text.replace(/"/g, '""')}"`;
+          };
+
+          const addRow = (url, status, state, parent, failureDetails) => {
+            rows.push(
+              [url, status, state, parent, failureDetails].map(escapeCsv).join(',')
+            );
+          };
+
+          const checkResponse = async (url, parent = '') => {
+            if (checked.has(url)) return;
+            checked.add(url);
+
+            try {
+              const response = await fetch(url);
+              addRow(url, response.status, response.ok ? 'pass' : 'fail', parent, response.ok ? '' : `HTTP ${response.status}`);
+              if (!response.ok) {
+                hasFailure = true;
+              }
+              return response.ok ? await response.text() : '';
+            } catch (error) {
+              const message = error instanceof Error ? error.message : 'Request failed';
+              addRow(url, 0, 'fail', parent, message);
+              hasFailure = true;
+              return '';
+            }
+          };
+
+          for (const page of pages) {
+            const pageUrl = new URL(page, base).toString();
+            const html = await checkResponse(pageUrl);
+            if (!html) continue;
+
+            const requiredAnchors = anchorChecks.get(page) ?? [];
+            for (const anchor of requiredAnchors) {
+              const hasAnchor = new RegExp(`id=["']${anchor}["']`, 'i').test(html) || new RegExp(`name=["']${anchor}["']`, 'i').test(html);
+              if (!hasAnchor) {
+                addRow(`${pageUrl}#${anchor}`, 404, 'fail', pageUrl, `Missing anchor #${anchor}`);
+                hasFailure = true;
+              }
+            }
+
+            const hrefs = [...html.matchAll(/href="([^"]+)"/g)].map((match) => match[1]);
+            for (const href of hrefs) {
+              if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) continue;
+
+              let resolved;
+              try {
+                resolved = new URL(href, pageUrl);
+              } catch {
+                continue;
+              }
+
+              if (resolved.origin !== base.origin) continue;
+              if (resolved.pathname.startsWith('/_next/')) continue;
+              if (resolved.pathname.startsWith('/api/')) continue;
+
+              const targetUrl = resolved.toString();
+              const targetHtml = await checkResponse(targetUrl, pageUrl);
+              if (resolved.pathname === '/' && resolved.hash) {
+                const anchor = resolved.hash.slice(1);
+                const hasAnchor = new RegExp(`id=["']${anchor}["']`, 'i').test(targetHtml) || new RegExp(`name=["']${anchor}["']`, 'i').test(targetHtml);
+                if (!hasAnchor) {
+                  addRow(targetUrl, 404, 'fail', pageUrl, `Missing anchor ${resolved.hash}`);
+                  hasFailure = true;
+                }
+              }
+            }
+          }
+
+          writeFileSync('../link-report.csv', `${rows.join('\n')}\n`);
+          if (hasFailure) {
+            process.exit(1);
+          }
+          NODE
 
           kill $SERVER_PID 2>/dev/null || true
 
@@ -167,5 +252,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: link-report
-          path: link-report.csv
+          path: link-report*.csv
           retention-days: 7

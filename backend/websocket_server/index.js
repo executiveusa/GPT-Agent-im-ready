@@ -1,76 +1,118 @@
-import express from 'express';
-import cors from 'cors';
-import http from 'http';
-import fs from 'node:fs';
-import path from 'node:path';
-import { Server } from 'socket.io';
-import { fileURLToPath } from 'node:url';
+import http from 'node:http';
+import { URL } from 'node:url';
+
 import { nextTurn } from '../conversation_engine/engine.js';
-import { generateSpeech } from '../voice_pipeline/generateSpeech.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, '..', '..');
-const registryPath = path.join(repoRoot, 'backend', 'data', 'agent_registry.json');
+const host = process.env.BACKEND_HOST || process.env.HOST || '0.0.0.0';
+const port = Number(process.env.BACKEND_PORT || process.env.PORT || 4001);
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use('/avatars_generated', express.static(path.join(repoRoot, 'assets', 'avatars_generated')));
-app.use('/voices', express.static(path.join(repoRoot, 'assets', 'voices')));
-app.use('/lipsync', express.static(path.join(repoRoot, 'assets', 'lipsync')));
+const state = {
+  turnIndex: 0,
+};
 
-app.get('/agent_registry', (req, res) => {
-  if (!fs.existsSync(registryPath)) return res.json({});
-  return res.json(JSON.parse(fs.readFileSync(registryPath, 'utf-8')));
-});
+function jsonResponse(res, statusCode, payload) {
+  const body = JSON.stringify(payload);
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Content-Length': Buffer.byteLength(body),
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  });
+  res.end(body);
+}
 
-app.post('/tts', (req, res) => {
-  const { text, voice = 'en', speaker = 'agent', turnId = Date.now() } = req.body;
-  try {
-    const out = generateSpeech({ speaker, text, voice, turnId });
-    res.json(out);
-  } catch (error) {
-    res.status(500).json({ error: String(error) });
+function getTurn(index) {
+  const turn = nextTurn(index);
+  return {
+    index,
+    speaker: turn.speaker,
+    text: turn.text,
+    emotion: turn.emotion,
+  };
+}
+
+function handleHealth(res) {
+  jsonResponse(res, 200, {
+    ok: true,
+    service: 'backend-websocket-server',
+    status: 'running',
+    host,
+    port,
+    nextTurnIndex: state.turnIndex,
+  });
+}
+
+function handleTurn(req, res, url) {
+  const indexParam = url.searchParams.get('index');
+  const parsedIndex = indexParam === null ? state.turnIndex : Number.parseInt(indexParam, 10);
+  const index = Number.isFinite(parsedIndex) ? parsedIndex : 0;
+  const turn = getTurn(index);
+
+  if (req.method === 'POST') {
+    state.turnIndex = index + 1;
   }
-});
 
-const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+  jsonResponse(res, 200, {
+    ok: true,
+    turn,
+    nextIndex: state.turnIndex,
+  });
+}
 
-io.on('connection', (socket) => {
-  socket.emit('connected', { ok: true });
-});
-
-let turn = 0;
-setInterval(() => {
-  if (!fs.existsSync(registryPath)) return;
-  const registry = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
-  const payload = nextTurn(turn++);
-  const cfg = registry[payload.speaker];
-  if (!cfg) return;
-
-  const turnId = `${Date.now()}`;
-  try {
-    const speech = generateSpeech({
-      speaker: payload.speaker,
-      text: payload.text,
-      voice: cfg.voice,
-      turnId,
-    });
-
-    io.emit('conversation_turn', {
-      ...payload,
-      ...speech,
-      seat: cfg.seat,
-    });
-    io.emit('agent_speaking', { speaker: payload.speaker });
-  } catch (error) {
-    console.error(error);
+const server = http.createServer((req, res) => {
+  if (!req.url) {
+    jsonResponse(res, 400, { ok: false, error: 'Missing request URL' });
+    return;
   }
-}, 9000);
 
-const port = process.env.AGENT_WORLD_PORT || 8788;
-server.listen(port, () => {
-  console.log(`Agent world server on :${port}`);
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204, {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    });
+    res.end();
+    return;
+  }
+
+  if (req.method === 'GET' && url.pathname === '/health') {
+    handleHealth(res);
+    return;
+  }
+
+  if ((req.method === 'GET' || req.method === 'POST') && url.pathname === '/api/turn') {
+    handleTurn(req, res, url);
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/advance') {
+    const next = getTurn(state.turnIndex);
+    state.turnIndex += 1;
+    jsonResponse(res, 200, {
+      ok: true,
+      turn: next,
+      nextIndex: state.turnIndex,
+    });
+    return;
+  }
+
+  jsonResponse(res, 404, {
+    ok: false,
+    error: 'Not found',
+  });
 });
+
+server.listen(port, host, () => {
+  console.log(`[backend-websocket-server] listening on http://${host}:${port}`);
+});
+
+function shutdown(signal) {
+  console.log(`[backend-websocket-server] received ${signal}, shutting down`);
+  server.close(() => process.exit(0));
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
