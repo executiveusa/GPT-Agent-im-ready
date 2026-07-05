@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
 
     // Check if route is available
     const health = await checkHealth();
-    if (!health[route.provider] && route.tier !== 'demo') {
+    if (!health[route.provider] && route.provider !== 'demo') {
       // Try fallback to demo if primary route unavailable
       return NextResponse.json(
         {
@@ -58,8 +58,9 @@ export async function POST(req: NextRequest) {
 
     if (stream) {
       // Streaming response
-      return new NextResponse(
-        (async function* () {
+      const encoder = new TextEncoder();
+      const streamBody = new ReadableStream<Uint8Array>({
+        async start(controller) {
           try {
             const { llmStream } = await import('@/lib/llm-router');
             for await (const chunk of llmStream(
@@ -68,24 +69,28 @@ export async function POST(req: NextRequest) {
               undefined,
               userKey
             )) {
-              yield chunk;
+              controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
             }
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
           } catch (error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
-            yield `ERROR: ${message}`;
+            controller.enqueue(encoder.encode(`data: ERROR: ${message}\n\n`));
+          } finally {
+            controller.close();
           }
-        })(),
-        {
-          headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-            'X-Request-ID': requestId,
-            'X-Provider': route.provider,
-            'X-Model': model,
-          },
-        }
-      );
+        },
+      });
+
+      return new NextResponse(streamBody, {
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          'X-Request-ID': requestId,
+          'X-Provider': route.provider,
+          'X-Model': model,
+        },
+      });
     } else {
       // Regular response
       const response = await llmChat(
