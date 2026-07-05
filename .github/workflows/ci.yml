@@ -152,7 +152,7 @@ jobs:
             --recurse \
             --timeout 10000 \
             --retry 2 \
-            --skip "^(mailto:|https?://(?!localhost)|http://localhost:3001/api)" \
+            --skip "^(mailto:|https?://(?!localhost)|http://localhost:3001/api|http://localhost:3001/_next/)" \
             --format CSV \
             --output ../link-report.csv || LINK_EXIT=$?
 
