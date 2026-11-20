@@ -1,0 +1,18 @@
+{
+  "google/gemma-4-26b-a4b-it:free": {
+    "inputPerMToken": 0,
+    "outputPerMToken": 0
+  },
+  "google/gemma-4-31b-it:free": {
+    "inputPerMToken": 0,
+    "outputPerMToken": 0
+  },
+  "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free": {
+    "inputPerMToken": 0,
+    "outputPerMToken": 0
+  },
+  "nvidia/nemotron-3-ultra-550b-a55b:free": {
+    "inputPerMToken": 0,
+    "outputPerMToken": 0
+  }
+}
