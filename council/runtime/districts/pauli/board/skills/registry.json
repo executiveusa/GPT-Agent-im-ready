@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "_comment": "Only independently prepared public workflow notes are registered. Other seat indexes are not presented as callable workflows.",
+  "skills": [
+    {
+      "id": "king-doe/public-workflows",
+      "seat": "king-doe",
+      "title": "Discovery, value pricing and proof workflows",
+      "path": "king-doe/workflows.md",
+      "keywords": [
+        "discovery",
+        "sales",
+        "pricing",
+        "price",
+        "proof",
+        "story",
+        "buyer",
+        "client",
+        "objection"
+      ],
+      "sources": [
+        "https://www.youtube.com/watch?v=67J7070mwFg",
+        "https://www.youtube.com/watch?v=b0fQyaBSSI0",
+        "https://www.youtube.com/watch?v=FFPaVFBEIhI"
+      ]
+    }
+  ]
+}
