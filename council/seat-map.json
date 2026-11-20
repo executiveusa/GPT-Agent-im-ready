@@ -1,0 +1,186 @@
+{
+ "generated": "2026-11-20",
+ "open_folder": "https://drive.google.com/drive/folders/1teAYKPJD6Gs6VD45oxyU7Z8Pgwy6C21a",
+ "seats": [
+  {
+   "seat_id": "king-doe",
+   "display_name": "King Doe",
+   "handle": "@thefutur (Chris Do) + one long-form interview",
+   "coverage": "full reference set",
+   "drive_files": {
+    "profile": "king-doe-profile.md",
+    "video_index": "video-index.json",
+    "workflows": "king-doe-workflows.md",
+    "topic_index": "king-doe-topic-index.md",
+    "reading_list": "king-doe-reading-list.md",
+    "gaps": "gaps.json"
+   },
+   "repo_dir": "council/king-doe/",
+   "repo_files": [
+    "PROFILE.md",
+    "WORKFLOWS.md",
+    "TOPIC-INDEX.md",
+    "READING-LIST.md",
+    "video-index.json",
+    "gaps.json"
+   ]
+  },
+  {
+   "seat_id": "kallaway",
+   "display_name": "Kallaway",
+   "handle": "@kallawaymarketing",
+   "coverage": "profile + 50 sources + video-index.json",
+   "drive_files": {
+    "sources": "kallaway-sources.md",
+    "profile": "kallaway-profile.md",
+    "video_index": "kallaway-video-index.json"
+   },
+   "repo_dir": "council/kallaway/",
+   "repo_files": [
+    "SOURCES.md",
+    "PROFILE.md",
+    "video-index.json"
+   ]
+  },
+  {
+   "seat_id": "phlash",
+   "display_name": "Phlash Consulting (Philip Risher)",
+   "handle": "@phlashconsulting",
+   "coverage": "profile + 50 sources + video-index.json",
+   "drive_files": {
+    "sources": "phlash-sources.md",
+    "profile": "phlash-profile.md",
+    "video_index": "phlash-video-index.json"
+   },
+   "repo_dir": "council/phlash/",
+   "repo_files": [
+    "SOURCES.md",
+    "PROFILE.md",
+    "video-index.json"
+   ]
+  },
+  {
+   "seat_id": "jake-van-clief",
+   "display_name": "Jake Van Clief",
+   "handle": "@jevanclief",
+   "coverage": "profile + 30 sources",
+   "drive_files": {
+    "sources": "jake-van-clief-sources.md",
+    "profile": "jake-van-clief-profile.md"
+   },
+   "repo_dir": "council/jake-van-clief/",
+   "repo_files": [
+    "SOURCES.md",
+    "PROFILE.md"
+   ]
+  },
+  {
+   "seat_id": "matt-pocock",
+   "display_name": "Matt Pocock",
+   "handle": "@mattpocockuk",
+   "coverage": "profile + 30 sources",
+   "drive_files": {
+    "sources": "matt-pocock-sources.md",
+    "profile": "matt-pocock-profile.md"
+   },
+   "repo_dir": "council/matt-pocock/",
+   "repo_files": [
+    "SOURCES.md",
+    "PROFILE.md"
+   ]
+  },
+  {
+   "seat_id": "indydevdan",
+   "display_name": "IndyDevDan",
+   "handle": "@indydevdan",
+   "coverage": "profile + 30 sources",
+   "drive_files": {
+    "sources": "indydevdan-sources.md",
+    "profile": "indydevdan-profile.md"
+   },
+   "repo_dir": "council/indydevdan/",
+   "repo_files": [
+    "SOURCES.md",
+    "PROFILE.md"
+   ]
+  },
+  {
+   "seat_id": "michele-torti",
+   "display_name": "Michele Torti",
+   "handle": "@michtortiyt",
+   "coverage": "30 sources (no profile yet)",
+   "drive_files": {
+    "sources": "michele-torti-sources.md"
+   },
+   "repo_dir": "council/michele-torti/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  },
+  {
+   "seat_id": "cody-schneider",
+   "display_name": "Cody Schneider",
+   "handle": "@codyschneider",
+   "coverage": "20 sources (no profile yet)",
+   "drive_files": {
+    "sources": "cody-schneider-sources.md"
+   },
+   "repo_dir": "council/cody-schneider/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  },
+  {
+   "seat_id": "boring-marketer",
+   "display_name": "The Boring Marketer",
+   "handle": "@boringmarketer",
+   "coverage": "20 sources (no profile yet)",
+   "drive_files": {
+    "sources": "boring-marketer-sources.md"
+   },
+   "repo_dir": "council/boring-marketer/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  },
+  {
+   "seat_id": "seth",
+   "display_name": "Seth Godin",
+   "handle": "20 books",
+   "coverage": "book list (no profile yet)",
+   "drive_files": {
+    "sources": "seth-sources.md"
+   },
+   "repo_dir": "council/seth/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  },
+  {
+   "seat_id": "hormozi",
+   "display_name": "Alex Hormozi",
+   "handle": "Hormozi + MoreMozi channels",
+   "coverage": "515 source titles (no profile yet)",
+   "drive_files": {
+    "sources": "hormozi-sources.md"
+   },
+   "repo_dir": "council/hormozi/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  },
+  {
+   "seat_id": "skeptic",
+   "display_name": "The Skeptic",
+   "handle": "persona-only",
+   "coverage": "persona note (no corpus)",
+   "drive_files": {
+    "sources": "skeptic-sources.md"
+   },
+   "repo_dir": "council/skeptic/",
+   "repo_files": [
+    "SOURCES.md"
+   ]
+  }
+ ]
+}
