@@ -1,0 +1,458 @@
+{
+ "member": "Kallaway",
+ "handle": "@kallawaymarketing",
+ "retrieved": "2026-10-20",
+ "scope": "latest 50 standard uploads",
+ "videos": [
+  {
+   "n": "01",
+   "video_id": "WluuZB_ck9Q",
+   "title": "How to Master Storytelling (Beginner to Advanced)",
+   "url": "https://www.youtube.com/watch?v=WluuZB_ck9Q",
+   "upload_date": "20261014",
+   "duration_seconds": 4013,
+   "words": 14890
+  },
+  {
+   "n": "02",
+   "video_id": "gEdt3AGLWjI",
+   "title": "7 Claude Skills So Powerful They Feel Illegal (It'll Blow Up Your Social Media)",
+   "url": "https://www.youtube.com/watch?v=gEdt3AGLWjI",
+   "upload_date": "20261008",
+   "duration_seconds": 1457,
+   "words": 5737
+  },
+  {
+   "n": "03",
+   "video_id": "vmsDhY9ITlI",
+   "title": "The ‘Invisible’ Hook That Makes Your Videos Impossible to Skip (Subliminal Influence)",
+   "url": "https://www.youtube.com/watch?v=vmsDhY9ITlI",
+   "upload_date": "20260930",
+   "duration_seconds": 1324,
+   "words": 5017
+  },
+  {
+   "n": "04",
+   "video_id": "S-7VkwSU0gs",
+   "title": "If I only had 90 days to build a personal brand, I’d do this",
+   "url": "https://www.youtube.com/watch?v=S-7VkwSU0gs",
+   "upload_date": "20260923",
+   "duration_seconds": 1632,
+   "words": 5925
+  },
+  {
+   "n": "05",
+   "video_id": "94ezZMYPzls",
+   "title": "I Reversed Engineered Social Media Algorithms",
+   "url": "https://www.youtube.com/watch?v=94ezZMYPzls",
+   "upload_date": "20260916",
+   "duration_seconds": 1178,
+   "words": 4180
+  },
+  {
+   "n": "06",
+   "video_id": "W--tE9w_N_A",
+   "title": "How to Become A Master Storyteller (It'll Blow Up Your Business)",
+   "url": "https://www.youtube.com/watch?v=W--tE9w_N_A",
+   "upload_date": "20260909",
+   "duration_seconds": 1236,
+   "words": 4508
+  },
+  {
+   "n": "07",
+   "video_id": "SJ0OtNuUzls",
+   "title": "The BEST & WORST Advice for Growing on Social Media",
+   "url": "https://www.youtube.com/watch?v=SJ0OtNuUzls",
+   "upload_date": "20260903",
+   "duration_seconds": 1534,
+   "words": 5781
+  },
+  {
+   "n": "08",
+   "video_id": "vwlK6MbdAto",
+   "title": "How to Use Claude To Grow From 0 to 100K Followers (Full Course)",
+   "url": "https://www.youtube.com/watch?v=vwlK6MbdAto",
+   "upload_date": "20260827",
+   "duration_seconds": 2950,
+   "words": 11863
+  },
+  {
+   "n": "09",
+   "video_id": "TNEyZxihwno",
+   "title": "I Blew Up On Social Media in 100 Days to Prove It's Not Luck (Again)",
+   "url": "https://www.youtube.com/watch?v=TNEyZxihwno",
+   "upload_date": "20260819",
+   "duration_seconds": 2264,
+   "words": 8932
+  },
+  {
+   "n": "10",
+   "video_id": "1ilMGCxJBQY",
+   "title": "The NEW Personal Brand Strategy Dominating Social Media in 2026",
+   "url": "https://www.youtube.com/watch?v=1ilMGCxJBQY",
+   "upload_date": "20260812",
+   "duration_seconds": 1769,
+   "words": 6935
+  },
+  {
+   "n": "11",
+   "video_id": "pNIYikmYsyw",
+   "title": "The Psychology of Killer Hooks",
+   "url": "https://www.youtube.com/watch?v=pNIYikmYsyw",
+   "upload_date": "20260805",
+   "duration_seconds": 1890,
+   "words": 6970
+  },
+  {
+   "n": "12",
+   "video_id": "fVsl4ZKCPik",
+   "title": "Everything I Learned Growing From 0 to 2M+ Followers in 3 Years",
+   "url": "https://www.youtube.com/watch?v=fVsl4ZKCPik",
+   "upload_date": "20260723",
+   "duration_seconds": 1621,
+   "words": 6205
+  },
+  {
+   "n": "13",
+   "video_id": "wKdElDeMXR0",
+   "title": "The Art of Personal Branding",
+   "url": "https://www.youtube.com/watch?v=wKdElDeMXR0",
+   "upload_date": "20260716",
+   "duration_seconds": 1831,
+   "words": 6194
+  },
+  {
+   "n": "14",
+   "video_id": "Cnk9NQ8JpCs",
+   "title": "5 Claude Skills To Grow Faster Than 99% of People on Social Media",
+   "url": "https://www.youtube.com/watch?v=Cnk9NQ8JpCs",
+   "upload_date": "20260708",
+   "duration_seconds": 1394,
+   "words": 5404
+  },
+  {
+   "n": "15",
+   "video_id": "ceRZVxO8KF8",
+   "title": "The NEW Rules of Social Media in the Age of AI",
+   "url": "https://www.youtube.com/watch?v=ceRZVxO8KF8",
+   "upload_date": "20260701",
+   "duration_seconds": 1320,
+   "words": 4925
+  },
+  {
+   "n": "16",
+   "video_id": "pSIY9ngEZC8",
+   "title": "The ONLY 4 Things You Need to Make Sales from EVERY Video",
+   "url": "https://www.youtube.com/watch?v=pSIY9ngEZC8",
+   "upload_date": "20260624",
+   "duration_seconds": 1600,
+   "words": 6048
+  },
+  {
+   "n": "17",
+   "video_id": "LvuoNlYRs7g",
+   "title": "How to Make ANY Topic Addictive on Social Media (The Illusion of Novelty)",
+   "url": "https://www.youtube.com/watch?v=LvuoNlYRs7g",
+   "upload_date": "20260618",
+   "duration_seconds": 1659,
+   "words": 6310
+  },
+  {
+   "n": "18",
+   "video_id": "6G1wIdxWF5w",
+   "title": "BY FAR, The Smartest Way to Build A Personal Brand in 2026",
+   "url": "https://www.youtube.com/watch?v=6G1wIdxWF5w",
+   "upload_date": "20260610",
+   "duration_seconds": 1460,
+   "words": 5365
+  },
+  {
+   "n": "19",
+   "video_id": "a7VjpIqq8Xk",
+   "title": "How To Create Irresistible Hooks With Claude (and blow up your content)",
+   "url": "https://www.youtube.com/watch?v=a7VjpIqq8Xk",
+   "upload_date": "20260528",
+   "duration_seconds": 1656,
+   "words": 6590
+  },
+  {
+   "n": "20",
+   "video_id": "DFSU-YPRTs8",
+   "title": "The BIGGEST Lies You’ve Been Told About Social Media",
+   "url": "https://www.youtube.com/watch?v=DFSU-YPRTs8",
+   "upload_date": "20260525",
+   "duration_seconds": 1165,
+   "words": 4443
+  },
+  {
+   "n": "21",
+   "video_id": "46t_cn0lx2E",
+   "title": "The NEW Era of Personal Brands is Here (and you’re not ready)",
+   "url": "https://www.youtube.com/watch?v=46t_cn0lx2E",
+   "upload_date": "20260514",
+   "duration_seconds": 1199,
+   "words": 4222
+  },
+  {
+   "n": "22",
+   "video_id": "B9l9TRhu5Vw",
+   "title": "Copy This System, It’ll Blow Up Your Social Media",
+   "url": "https://www.youtube.com/watch?v=B9l9TRhu5Vw",
+   "upload_date": "20260507",
+   "duration_seconds": 1967,
+   "words": 8124
+  },
+  {
+   "n": "23",
+   "video_id": "ImzoNTrgvFg",
+   "title": "The NEW Way to WIN on Social Media in 2026",
+   "url": "https://www.youtube.com/watch?v=ImzoNTrgvFg",
+   "upload_date": "20260429",
+   "duration_seconds": 1454,
+   "words": 5184
+  },
+  {
+   "n": "24",
+   "video_id": "KyC8r-zitVE",
+   "title": "The Neuroscience of Addictive Storytelling (And How to Master It)",
+   "url": "https://www.youtube.com/watch?v=KyC8r-zitVE",
+   "upload_date": "20260422",
+   "duration_seconds": 1308,
+   "words": 4769
+  },
+  {
+   "n": "25",
+   "video_id": "cuVyTmbOZjk",
+   "title": "How to Build an Audience That's Obsessed With You (The Power of Suggestion)",
+   "url": "https://www.youtube.com/watch?v=cuVyTmbOZjk",
+   "upload_date": "20260415",
+   "duration_seconds": 1410,
+   "words": 5070
+  },
+  {
+   "n": "26",
+   "video_id": "bqzd0h0gmU0",
+   "title": "How ‘Regular’ People Are Making Millions From Social Media",
+   "url": "https://www.youtube.com/watch?v=bqzd0h0gmU0",
+   "upload_date": "20260401",
+   "duration_seconds": 1273,
+   "words": 4574
+  },
+  {
+   "n": "27",
+   "video_id": "8cQidXgtGmU",
+   "title": "How Social Media Algorithms Actually Work (And How to Beat Them)",
+   "url": "https://www.youtube.com/watch?v=8cQidXgtGmU",
+   "upload_date": "20260325",
+   "duration_seconds": 1040,
+   "words": 3716
+  },
+  {
+   "n": "28",
+   "video_id": "ZM3elcBE48I",
+   "title": "Speaking Like This Gives You an Unfair Advantage on Social Media",
+   "url": "https://www.youtube.com/watch?v=ZM3elcBE48I",
+   "upload_date": "20260318",
+   "duration_seconds": 1276,
+   "words": 4922
+  },
+  {
+   "n": "29",
+   "video_id": "xw_hhw1V1A8",
+   "title": "How To Build a Personal Brand That’s Magnetic As F*ck",
+   "url": "https://www.youtube.com/watch?v=xw_hhw1V1A8",
+   "upload_date": "20260312",
+   "duration_seconds": 1120,
+   "words": 3941
+  },
+  {
+   "n": "30",
+   "video_id": "Lf7ZXu4WiUs",
+   "title": "How to Get Rich on Social Media (Without Luck, Time, or Being a Genius)",
+   "url": "https://www.youtube.com/watch?v=Lf7ZXu4WiUs",
+   "upload_date": "20260305",
+   "duration_seconds": 1198,
+   "words": 4609
+  },
+  {
+   "n": "31",
+   "video_id": "pcnrzBwoVUk",
+   "title": "Say This in Your Videos, It’ll Improve Your Storytelling by 10x",
+   "url": "https://www.youtube.com/watch?v=pcnrzBwoVUk",
+   "upload_date": "20260225",
+   "duration_seconds": 1153,
+   "words": 4328
+  },
+  {
+   "n": "32",
+   "video_id": "8VolLwMCLuY",
+   "title": "Copy This Hook, It'll Blow Up Your Social Media",
+   "url": "https://www.youtube.com/watch?v=8VolLwMCLuY",
+   "upload_date": "20260218",
+   "duration_seconds": 915,
+   "words": 3570
+  },
+  {
+   "n": "33",
+   "video_id": "o_n5ED5fE1I",
+   "title": "If I Started Social Media From Scratch in 2026, I’d Do This",
+   "url": "https://www.youtube.com/watch?v=o_n5ED5fE1I",
+   "upload_date": "20260211",
+   "duration_seconds": 1091,
+   "words": 3978
+  },
+  {
+   "n": "34",
+   "video_id": "DSDNiug5EH4",
+   "title": "AI is About to Change Social Media Forever. Be Prepared.",
+   "url": "https://www.youtube.com/watch?v=DSDNiug5EH4",
+   "upload_date": "20260204",
+   "duration_seconds": 742,
+   "words": 2814
+  },
+  {
+   "n": "35",
+   "video_id": "z8j3PupS5gc",
+   "title": "How I Grew from 0 to 250,000 Subscribers in 1 Year (Nobody Teaches This)",
+   "url": "https://www.youtube.com/watch?v=z8j3PupS5gc",
+   "upload_date": "20260128",
+   "duration_seconds": 1306,
+   "words": 4927
+  },
+  {
+   "n": "36",
+   "video_id": "pS2Mi1IQI-c",
+   "title": "6 Social Media Trends That Will Define 2026",
+   "url": "https://www.youtube.com/watch?v=pS2Mi1IQI-c",
+   "upload_date": "20260114",
+   "duration_seconds": 953,
+   "words": 3391
+  },
+  {
+   "n": "37",
+   "video_id": "i7upRL4H1FM",
+   "title": "Give me 18 minutes, and I’ll improve your video by 193%",
+   "url": "https://www.youtube.com/watch?v=i7upRL4H1FM",
+   "upload_date": "20251231",
+   "duration_seconds": 1081,
+   "words": 4205
+  },
+  {
+   "n": "38",
+   "video_id": "onQoYdxWXdA",
+   "title": "How to Create a Killer Hook (Impossible to Skip)",
+   "url": "https://www.youtube.com/watch?v=onQoYdxWXdA",
+   "upload_date": "20251222",
+   "duration_seconds": 1318,
+   "words": 5148
+  },
+  {
+   "n": "39",
+   "video_id": "vX-inQa3MKk",
+   "title": "The Future Of Social Media Is Here",
+   "url": "https://www.youtube.com/watch?v=vX-inQa3MKk",
+   "upload_date": "20251211",
+   "duration_seconds": 1548,
+   "words": 5508
+  },
+  {
+   "n": "40",
+   "video_id": "fk6LExgMPxI",
+   "title": "How to Speedrun Social Media",
+   "url": "https://www.youtube.com/watch?v=fk6LExgMPxI",
+   "upload_date": "20251204",
+   "duration_seconds": 2373,
+   "words": 9455
+  },
+  {
+   "n": "41",
+   "video_id": "SDHKQbKC7gA",
+   "title": "Storytelling Is Easier Than You Think",
+   "url": "https://www.youtube.com/watch?v=SDHKQbKC7gA",
+   "upload_date": "20251126",
+   "duration_seconds": 1722,
+   "words": 6445
+  },
+  {
+   "n": "42",
+   "video_id": "jtmstMt4WLc",
+   "title": "How to Become a Storytelling Genius (Dopamine Ladders)",
+   "url": "https://www.youtube.com/watch?v=jtmstMt4WLc",
+   "upload_date": "20251120",
+   "duration_seconds": 1345,
+   "words": 5051
+  },
+  {
+   "n": "43",
+   "video_id": "1q__Vs2JqbI",
+   "title": "How to Create Any Content 10x Faster With AI",
+   "url": "https://www.youtube.com/watch?v=1q__Vs2JqbI",
+   "upload_date": "20251113",
+   "duration_seconds": 2092,
+   "words": 8225
+  },
+  {
+   "n": "44",
+   "video_id": "7pCEsr-0KIw",
+   "title": "If You Don't Understand Psychology, You Don't Understand Social Media",
+   "url": "https://www.youtube.com/watch?v=7pCEsr-0KIw",
+   "upload_date": "20251106",
+   "duration_seconds": 1053,
+   "words": 3904
+  },
+  {
+   "n": "45",
+   "video_id": "tVZOS5Z019U",
+   "title": "I Studied 10,000+ Videos, These Mistakes Are Killing Your Content",
+   "url": "https://www.youtube.com/watch?v=tVZOS5Z019U",
+   "upload_date": "20251030",
+   "duration_seconds": 1608,
+   "words": 6056
+  },
+  {
+   "n": "46",
+   "video_id": "jZCupmAOMAE",
+   "title": "Why The Smartest Creators I Know Focus on Packaging, Not Content",
+   "url": "https://www.youtube.com/watch?v=jZCupmAOMAE",
+   "upload_date": "20251022",
+   "duration_seconds": 1483,
+   "words": 5614
+  },
+  {
+   "n": "47",
+   "video_id": "acEJRhZBSVk",
+   "title": "Everything you know about content is (probably) wrong",
+   "url": "https://www.youtube.com/watch?v=acEJRhZBSVk",
+   "upload_date": "20251016",
+   "duration_seconds": 740,
+   "words": 2738
+  },
+  {
+   "n": "48",
+   "video_id": "XxzV82GNolg",
+   "title": "You’re Not Ready for the Next Phase of Social Media",
+   "url": "https://www.youtube.com/watch?v=XxzV82GNolg",
+   "upload_date": "20251009",
+   "duration_seconds": 1583,
+   "words": 5986
+  },
+  {
+   "n": "49",
+   "video_id": "S9FlxFv9dxg",
+   "title": "The ONLY 6 Words You Need to Hook ANY Viewer",
+   "url": "https://www.youtube.com/watch?v=S9FlxFv9dxg",
+   "upload_date": "20251001",
+   "duration_seconds": 997,
+   "words": 3872
+  },
+  {
+   "n": "50",
+   "video_id": "SnUZdT3EpPg",
+   "title": "How to WIN on Social Media as a Business Owner in 2026 (Nobody Teaches this)",
+   "url": "https://www.youtube.com/watch?v=SnUZdT3EpPg",
+   "upload_date": "20250924",
+   "duration_seconds": 1868,
+   "words": 6666
+  }
+ ]
+}
