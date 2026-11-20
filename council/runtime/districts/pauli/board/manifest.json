@@ -1,0 +1,79 @@
+{
+  "_comment": "Public reference subset. Some seats have only source indexes, not full profiles or tested workflows. Offline tests do not authorize live calls.",
+  "chairModel": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+  "openerSeat": "king-doe",
+  "seats": [
+    {
+      "id": "king-doe",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../king-doe/PROFILE.md"
+    },
+    {
+      "id": "hormozi",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "weight": 1,
+      "brain": "../../../../hormozi/SOURCES.md"
+    },
+    {
+      "id": "skeptic",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../skeptic/SOURCES.md"
+    },
+    {
+      "id": "seth",
+      "model": "google/gemma-4-26b-a4b-it:free",
+      "weight": 1,
+      "brain": "../../../../seth/SOURCES.md"
+    },
+    {
+      "id": "indydevdan",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "weight": 1,
+      "brain": "../../../../indydevdan/PROFILE.md"
+    },
+    {
+      "id": "matt-pocock",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../matt-pocock/PROFILE.md"
+    },
+    {
+      "id": "jake-van-clief",
+      "model": "google/gemma-4-26b-a4b-it:free",
+      "weight": 1,
+      "brain": "../../../../jake-van-clief/PROFILE.md"
+    },
+    {
+      "id": "boring-marketer",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "weight": 1,
+      "brain": "../../../../boring-marketer/SOURCES.md"
+    },
+    {
+      "id": "cody-schneider",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b:free",
+      "weight": 1,
+      "brain": "../../../../cody-schneider/SOURCES.md"
+    },
+    {
+      "id": "michele-torti",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../michele-torti/SOURCES.md"
+    },
+    {
+      "id": "kallaway",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../kallaway/PROFILE.md"
+    },
+    {
+      "id": "phlash",
+      "model": "google/gemma-4-31b-it:free",
+      "weight": 1,
+      "brain": "../../../../phlash/PROFILE.md"
+    }
+  ]
+}
